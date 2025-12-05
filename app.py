@@ -110,7 +110,7 @@ with top_right:
     # Fix lỗi: text=[...]
     fig_ebitda.add_trace(go.Bar(name='EBITDA (Tỷ)', x=months, y=[25, 30, 20, 40, 45, 50], marker_color='#2ca02c', text=[25, 30, 20, 40, 45, 50], textposition='auto'))
     fig_ebitda.add_trace(go.Scatter(name='% Margin', x=months, y=[10, 12, 8, 15, 16, 18], yaxis='y2', line=dict(color='#ff7f0e', width=3), mode='lines+markers+text', text=[10, 12, 8, 15, 16, 18], textposition='top center'))
-    fig_ebitda.update_layout(yaxis2=dict(overlaying='y', side='right', range=[0, 30]), legend=dict(orientation="h", y=1.1), margin=dict(t=30, b=0), height=250)
+    fig_ebitda.update_layout(yaxis2=dict(overlaying='y', side='right', range=[0, 30]), legend=dict(orientation="h", y=1.1), margin=dict(t=30, b=0), height=260)
     st.plotly_chart(fig_ebitda, use_container_width=True)
 
     # 2.3 Waterfall
@@ -121,7 +121,7 @@ with top_right:
         x=["Đầu kỳ", "Thu Tour", "Tiền mặt", "Trả NCC", "Chi phí", "Cuối kỳ"],
         y=[200, 800, 0, -400, -250, 0], text=[200, 800, 1000, -400, -250, 350],textposition="outside", connector={"line": {"color": "rgb(63, 63, 63)"}}
     ))
-    fig_waterfall.update_layout(margin=dict(t=30, b=0), height=250, yaxis=dict(
+    fig_waterfall.update_layout(margin=dict(t=30, b=0), height=260, yaxis=dict(
         automargin=True, 
         range=[0, 1200]  
     ))
