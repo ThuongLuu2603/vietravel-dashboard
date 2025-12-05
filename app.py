@@ -47,7 +47,7 @@ top_left, top_right = st.columns([1.8, 1.2])
 with top_left:
     st.markdown('<div class="header-style">1. KINH DOANH: DOANH THU & HIỆU SUẤT</div>', unsafe_allow_html=True)
     
-    # 1.1 KPI
+    # 1.1 KPI (Giữ nguyên chiều cao 350)
     st.markdown('**Tỷ lệ Hoàn thành Kế hoạch (Target = 100%)**')
     entities = ['Toàn Cty', 'HO & ĐNB', 'Miền Bắc', 'Miền Trung', 'Miền Tây']
     act_rev_pct = [0.95, 1.05, 0.90, 0.85, 0.60]
@@ -65,17 +65,17 @@ with top_left:
         fig_kpi.add_trace(go.Bar(name=name+" Vượt", x=entities, y=[max(v - 1.0, 0) for v in values],
                                  marker_color='#32CD32', offsetgroup=offset_group, base=1.0,
                                  legendgroup=name, showlegend=False, 
-                                 text=[f"+{v*100:.0f}%" if v>0 else "" for v in [max(v - 1.0, 0) for v in values]], textposition='outside')) # Fix lỗi biến overs
+                                 text=[f"+{v*100:.0f}%" if v>0 else "" for v in [max(v - 1.0, 0) for v in values]], textposition='outside'))
 
     add_kpi_group("Doanh thu", act_rev_pct, '#0051a3', '#aec7e8', 0)
     add_kpi_group("Lượt khách", act_pax_pct, '#ff7f0e', '#ffbb78', 1)
     add_kpi_group("Lãi gộp", act_gp_pct, '#d62728', '#f4cccc', 2)
 
-    fig_kpi.update_layout(barmode='group', yaxis_tickformat='.0%', height=380, margin=dict(t=20, b=20),
+    fig_kpi.update_layout(barmode='group', yaxis_tickformat='.0%', height=350, margin=dict(t=20, b=20),
                           shapes=[dict(type="line", xref="paper", x0=0, x1=1, yref="y", y0=1, y1=1, line=dict(color="red", width=2, dash="dash"))])
     st.plotly_chart(fig_kpi, use_container_width=True)
 
-    # 1.2 Doanh thu
+    # 1.2 Doanh thu (Giữ nguyên chiều cao 350)
     st.markdown('**Doanh thu & Đóng góp của Hub (Tỷ VNĐ)**')
     months = ['T1', 'T2', 'T3', 'T4', 'T5', 'T6'] 
     data_rev = {
@@ -85,13 +85,14 @@ with top_left:
     }
     df_rev = pd.DataFrame(data_rev)
     fig_rev = px.bar(df_rev, x="Tháng", y="Doanh Thu", color="Hub", title="", text_auto=True, color_discrete_map=COLOR_MAP)
-    fig_rev.update_traces(textposition='inside', textfont_color='white') 
+    fig_rev.update_traces(textposition='inside', textfont_color='white')
+    fig_rev.update_layout(height=350, margin=dict(t=20, b=20))
     st.plotly_chart(fig_rev, use_container_width=True)
 
 with top_right:
     st.markdown('<div class="header-style">2. TÀI CHÍNH</div>', unsafe_allow_html=True)
     
-    # 2.1 NET MARGIN (ĐÃ GOM 1 HÀNG)
+    # 2.1 NET MARGIN (GOM 1 HÀNG, HEIGHT 100)
     st.markdown('<div style="font-size:14px; font-weight:bold; color:#666; margin-bottom:5px;">BIÊN LỢI NHUẬN RÒNG (NET MARGIN)</div>', unsafe_allow_html=True)
     nm_col1, nm_col2 = st.columns([1, 2])
     with nm_col1:
@@ -100,21 +101,19 @@ with top_right:
         spark_months = ['T6', 'T7', 'T8', 'T9', 'T10', 'T11']
         spark_values = [5.0, 6.0, 5.5, 7.0, 8.0, 8.5]
         fig_spark = go.Figure(go.Scatter(x=spark_months, y=spark_values, mode='lines+markers+text', text=[f"{v}" for v in spark_values], textposition="top center", line=dict(color='#2ca02c', width=3), marker=dict(size=7, color='white', line=dict(width=2, color='#2ca02c'))))
-        # GIẢM HEIGHT XUỐNG 100PX CHO GỌN
         fig_spark.update_layout(height=100, margin=dict(l=10, r=10, t=20, b=10), xaxis=dict(showgrid=False, showline=False), yaxis=dict(showgrid=False, visible=False, range=[4, 10]))
         st.plotly_chart(fig_spark, use_container_width=True)
     
-    # 2.2 EBITDA (ĐÃ SỬA LỖI TEXT_AUTO & GIẢM CHIỀU CAO)
+    # 2.2 EBITDA (SỬA LỖI TEXT_AUTO & GIẢM HEIGHT CÒN 230)
     st.markdown('**EBITDA & Margin**')
     fig_ebitda = go.Figure()
-    # Dùng text=[...] thay vì text_auto=True để tránh lỗi
+    # Fix lỗi: text=[...]
     fig_ebitda.add_trace(go.Bar(name='EBITDA (Tỷ)', x=months, y=[25, 30, 20, 40, 45, 50], marker_color='#2ca02c', text=[25, 30, 20, 40, 45, 50], textposition='auto'))
     fig_ebitda.add_trace(go.Scatter(name='% Margin', x=months, y=[10, 12, 8, 15, 16, 18], yaxis='y2', line=dict(color='#ff7f0e', width=3), mode='lines+markers+text', text=[10, 12, 8, 15, 16, 18], textposition='top center'))
-    # GIẢM HEIGHT XUỐNG 250PX
-    fig_ebitda.update_layout(yaxis2=dict(overlaying='y', side='right', range=[0, 30]), legend=dict(orientation="h", y=1.1), margin=dict(t=30, b=0), height=250)
+    fig_ebitda.update_layout(yaxis2=dict(overlaying='y', side='right', range=[0, 30]), legend=dict(orientation="h", y=1.1), margin=dict(t=30, b=0), height=230)
     st.plotly_chart(fig_ebitda, use_container_width=True)
 
-    # 2.3 Waterfall (GIẢM CHIỀU CAO)
+    # 2.3 Waterfall (GIẢM HEIGHT CÒN 230)
     st.markdown('**Dòng tiền (Cashflow)**')
     fig_waterfall = go.Figure(go.Waterfall(
         name="Cashflow", orientation="v", measure=["relative"]*5+["total"],
@@ -122,8 +121,7 @@ with top_right:
         y=[200, 800, 0, -400, -250, 0], text=[200, 800, 1000, -400, -250, 350],
         textposition="outside", connector={"line": {"color": "rgb(63, 63, 63)"}}
     ))
-    # GIẢM HEIGHT XUỐNG 250PX
-    fig_waterfall.update_layout(margin=dict(t=20, b=20), height=250)
+    fig_waterfall.update_layout(margin=dict(t=20, b=20), height=230)
     st.plotly_chart(fig_waterfall, use_container_width=True)
 
 # ==============================================================================
