@@ -9,19 +9,14 @@ st.set_page_config(layout="wide", page_title="Vietravel Strategic Dashboard")
 
 # --- BẢNG MÀU CHIẾN LƯỢC ---
 COLOR_MAP = {
-    "Toàn Cty": "#333333",
-    "HO & ĐNB": "#0051a3",    
-    "Miền Bắc": "#d62728",    
-    "Miền Trung": "#ffcd00",  
-    "Miền Tây": "#2ca02c",    
+    "Toàn Cty": "#333333", "HO & ĐNB": "#0051a3", "Miền Bắc": "#d62728", 
+    "Miền Trung": "#ffcd00", "Miền Tây": "#2ca02c",
     "Inbound": "#17becf", "Outbound": "#0051a3", "Domestic": "#ff7f0e",
-    # MÀU TUYẾN
     "Đông Bắc Á": "#9467bd", "Âu Úc Mỹ": "#1f77b4", "Đông Nam Á": "#ff7f0e", "Nội địa": "#2ca02c",
-    # Kênh Marketing
     "Facebook": "#4267B2", "Google": "#DB4437", "Tiktok": "#000000", "Event": "#FFC107", "Báo chí": "#757575"
 }
 
-# CSS Style
+# --- CSS STYLE ---
 st.markdown("""
 <style>
     .header-style {font-size: 22px; font-weight: bold; margin-top: 20px; margin-bottom: 10px; color: #ffcd00; background-color: #0051a3; padding: 8px 15px; border-radius: 5px;}
@@ -30,16 +25,10 @@ st.markdown("""
     .metric-value {font-size: 36px; font-weight: 800; color: #0051a3;} 
     .metric-delta {font-size: 16px; font-weight: bold; color: #2ca02c;}
     
-    /* CSS RIÊNG CHO NET MARGIN NẰM NGANG */
-    .nm-container {
-        display: flex; 
-        flex-direction: column; 
-        justify-content: center; 
-        height: 100%; 
-        padding-top: 15px;
-    }
-    .nm-val {font-size: 40px; font-weight: 900; color: #0051a3; line-height: 1;}
-    .nm-delta {font-size: 18px; font-weight: bold; color: #2ca02c;}
+    /* CSS CHO NET MARGIN NẰM NGANG */
+    .nm-container { display: flex; align-items: center; justify-content: center; height: 100%; }
+    .nm-val { font-size: 40px; font-weight: 900; color: #0051a3; margin-right: 10px; }
+    .nm-delta { font-size: 18px; font-weight: bold; color: #2ca02c; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -51,14 +40,14 @@ filter_period = st.sidebar.selectbox("Giai đoạn:", ["Tháng 11/2025", "Quý 4
 st.title(f"DASHBOARD CHIẾN LƯỢC VIETRAVEL - {filter_period}")
 
 # ==============================================================================
-# HÀNG 1: KINH DOANH (KPI LÊN TRÊN, DOANH THU XUỐNG DƯỚI)
+# HÀNG 1: KINH DOANH & TÀI CHÍNH
 # ==============================================================================
 top_left, top_right = st.columns([1.8, 1.2])
 
 with top_left:
     st.markdown('<div class="header-style">1. KINH DOANH: DOANH THU & HIỆU SUẤT</div>', unsafe_allow_html=True)
     
-    # 1.1 TỶ LỆ HOÀN THÀNH KẾ HOẠCH (ƯU TIÊN)
+    # 1.1 KPI
     st.markdown('**Tỷ lệ Hoàn thành Kế hoạch (Target = 100%)**')
     entities = ['Toàn Cty', 'HO & ĐNB', 'Miền Bắc', 'Miền Trung', 'Miền Tây']
     act_rev_pct = [0.95, 1.05, 0.90, 0.85, 0.60]
@@ -66,30 +55,27 @@ with top_left:
     act_gp_pct  = [0.88, 1.15, 0.65, 0.90, 0.40]
 
     fig_kpi = go.Figure()
-    
     def add_kpi_group(name, values, color_solid, color_gap, offset_group):
         fig_kpi.add_trace(go.Bar(name=name, x=entities, y=[min(v, 1.0) for v in values],
                                  marker_color=color_solid, offsetgroup=offset_group, legendgroup=name,
                                  text=[f"{v*100:.0f}%" for v in values], textposition='auto'))
-        gaps = [max(1.0 - v, 0) for v in values]
-        fig_kpi.add_trace(go.Bar(name=name+" Gap", x=entities, y=gaps,
+        fig_kpi.add_trace(go.Bar(name=name+" Gap", x=entities, y=[max(1.0 - v, 0) for v in values],
                                  marker_color=color_gap, offsetgroup=offset_group, base=[min(v, 1.0) for v in values],
                                  legendgroup=name, showlegend=False, hoverinfo='skip'))
-        overs = [max(v - 1.0, 0) for v in values]
-        fig_kpi.add_trace(go.Bar(name=name+" Vượt", x=entities, y=overs,
+        fig_kpi.add_trace(go.Bar(name=name+" Vượt", x=entities, y=[max(v - 1.0, 0) for v in values],
                                  marker_color='#32CD32', offsetgroup=offset_group, base=1.0,
                                  legendgroup=name, showlegend=False, 
-                                 text=[f"+{v*100:.0f}%" if v>0 else "" for v in overs], textposition='outside'))
+                                 text=[f"+{v*100:.0f}%" if v>0 else "" for v in [max(v - 1.0, 0) for v in values]], textposition='outside')) # Fix lỗi biến overs
 
     add_kpi_group("Doanh thu", act_rev_pct, '#0051a3', '#aec7e8', 0)
     add_kpi_group("Lượt khách", act_pax_pct, '#ff7f0e', '#ffbb78', 1)
     add_kpi_group("Lãi gộp", act_gp_pct, '#d62728', '#f4cccc', 2)
 
-    fig_kpi.update_layout(barmode='group', yaxis_tickformat='.0%', height=450, margin=dict(t=20, b=20),
+    fig_kpi.update_layout(barmode='group', yaxis_tickformat='.0%', height=380, margin=dict(t=20, b=20),
                           shapes=[dict(type="line", xref="paper", x0=0, x1=1, yref="y", y0=1, y1=1, line=dict(color="red", width=2, dash="dash"))])
     st.plotly_chart(fig_kpi, use_container_width=True)
 
-    # 1.2 DOANH THU THỰC TẾ
+    # 1.2 Doanh thu
     st.markdown('**Doanh thu & Đóng góp của Hub (Tỷ VNĐ)**')
     months = ['T1', 'T2', 'T3', 'T4', 'T5', 'T6'] 
     data_rev = {
@@ -105,57 +91,39 @@ with top_left:
 with top_right:
     st.markdown('<div class="header-style">2. TÀI CHÍNH</div>', unsafe_allow_html=True)
     
-    # --- PHẦN SỬA ĐỔI: GOM NET MARGIN VỀ 1 HÀNG ---
-    st.markdown('<div style="font-size:14px; font-weight:bold; color:#666;">BIÊN LỢI NHUẬN RÒNG (NET MARGIN)</div>', unsafe_allow_html=True)
-    
-    # Chia cột: Bên trái là Số, Bên phải là Biểu đồ
+    # 2.1 NET MARGIN (ĐÃ GOM 1 HÀNG)
+    st.markdown('<div style="font-size:14px; font-weight:bold; color:#666; margin-bottom:5px;">BIÊN LỢI NHUẬN RÒNG (NET MARGIN)</div>', unsafe_allow_html=True)
     nm_col1, nm_col2 = st.columns([1, 2])
-    
     with nm_col1:
-        # Số liệu hiển thị to
-        st.markdown("""
-        <div class="nm-container">
-            <div class="nm-val">8.5%</div>
-            <div class="nm-delta">▲ 0.5%</div>
-        </div>
-        """, unsafe_allow_html=True)
-        
+        st.markdown('<div class="nm-container"><span class="nm-val">8.5%</span><span class="nm-delta">▲ 0.5%</span></div>', unsafe_allow_html=True)
     with nm_col2:
-        # Biểu đồ Sparkline (Thu nhỏ chiều cao để khớp với số)
         spark_months = ['T6', 'T7', 'T8', 'T9', 'T10', 'T11']
         spark_values = [5.0, 6.0, 5.5, 7.0, 8.0, 8.5]
-        fig_spark = go.Figure()
-        fig_spark.add_trace(go.Scatter(
-            x=spark_months, y=spark_values, mode='lines+markers+text',
-            text=[f"{v}" for v in spark_values], textposition="top center",
-            line=dict(color='#2ca02c', width=3), marker=dict(size=7, color='white', line=dict(width=2, color='#2ca02c'))
-        ))
-        # Tinh chỉnh margin và height cho gọn
-        fig_spark.update_layout(height=120, margin=dict(l=10, r=10, t=20, b=10),
-                                title=None, xaxis=dict(showgrid=False, showline=False),
-                                yaxis=dict(showgrid=False, visible=False, range=[4, 10]))
+        fig_spark = go.Figure(go.Scatter(x=spark_months, y=spark_values, mode='lines+markers+text', text=[f"{v}" for v in spark_values], textposition="top center", line=dict(color='#2ca02c', width=3), marker=dict(size=7, color='white', line=dict(width=2, color='#2ca02c'))))
+        # GIẢM HEIGHT XUỐNG 100PX CHO GỌN
+        fig_spark.update_layout(height=100, margin=dict(l=10, r=10, t=20, b=10), xaxis=dict(showgrid=False, showline=False), yaxis=dict(showgrid=False, visible=False, range=[4, 10]))
         st.plotly_chart(fig_spark, use_container_width=True)
     
-    # 2.1 EBITDA
+    # 2.2 EBITDA (ĐÃ SỬA LỖI TEXT_AUTO & GIẢM CHIỀU CAO)
     st.markdown('**EBITDA & Margin**')
     fig_ebitda = go.Figure()
-    fig_ebitda.add_trace(go.Bar(name='EBITDA (Tỷ)', x=months, y=[25, 30, 20, 40, 45, 50], 
-                                marker_color='#2ca02c', text=[25, 30, 20, 40, 45, 50], textposition='auto'))
-    fig_ebitda.add_trace(go.Scatter(name='% Margin', x=months, y=[10, 12, 8, 15, 16, 18], yaxis='y2', 
-                                    line=dict(color='#ff7f0e', width=3), mode='lines+markers+text', text=[10, 12, 8, 15, 16, 18], textposition='top center'))
-    fig_ebitda.update_layout(yaxis2=dict(overlaying='y', side='right', range=[0, 30]), legend=dict(orientation="h", y=1.1), margin=dict(t=30, b=0))
+    # Dùng text=[...] thay vì text_auto=True để tránh lỗi
+    fig_ebitda.add_trace(go.Bar(name='EBITDA (Tỷ)', x=months, y=[25, 30, 20, 40, 45, 50], marker_color='#2ca02c', text=[25, 30, 20, 40, 45, 50], textposition='auto'))
+    fig_ebitda.add_trace(go.Scatter(name='% Margin', x=months, y=[10, 12, 8, 15, 16, 18], yaxis='y2', line=dict(color='#ff7f0e', width=3), mode='lines+markers+text', text=[10, 12, 8, 15, 16, 18], textposition='top center'))
+    # GIẢM HEIGHT XUỐNG 250PX
+    fig_ebitda.update_layout(yaxis2=dict(overlaying='y', side='right', range=[0, 30]), legend=dict(orientation="h", y=1.1), margin=dict(t=30, b=0), height=250)
     st.plotly_chart(fig_ebitda, use_container_width=True)
 
-    # 2.3 Waterfall
+    # 2.3 Waterfall (GIẢM CHIỀU CAO)
     st.markdown('**Dòng tiền (Cashflow)**')
     fig_waterfall = go.Figure(go.Waterfall(
-        name="Cashflow", orientation="v",
-        measure=["relative", "relative", "total", "relative", "relative", "total"],
+        name="Cashflow", orientation="v", measure=["relative"]*5+["total"],
         x=["Đầu kỳ", "Thu Tour", "Tiền mặt", "Trả NCC", "Chi phí", "Cuối kỳ"],
         y=[200, 800, 0, -400, -250, 0], text=[200, 800, 1000, -400, -250, 350],
         textposition="outside", connector={"line": {"color": "rgb(63, 63, 63)"}}
     ))
-    fig_waterfall.update_layout(margin=dict(t=20, b=20))
+    # GIẢM HEIGHT XUỐNG 250PX
+    fig_waterfall.update_layout(margin=dict(t=20, b=20), height=250)
     st.plotly_chart(fig_waterfall, use_container_width=True)
 
 # ==============================================================================
