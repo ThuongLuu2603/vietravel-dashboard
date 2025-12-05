@@ -40,27 +40,14 @@ filter_period = st.sidebar.selectbox("Giai đoạn:", ["Tháng 11/2025", "Quý 4
 st.title(f"DASHBOARD CHIẾN LƯỢC VIETRAVEL - {filter_period}")
 
 # ==============================================================================
-# HÀNG 1: KINH DOANH
+# HÀNG 1: KINH DOANH (ĐÃ ĐỔI CHỖ KPI LÊN TRÊN)
 # ==============================================================================
 top_left, top_right = st.columns([1.8, 1.2])
 
 with top_left:
     st.markdown('<div class="header-style">1. KINH DOANH: DOANH THU & HIỆU SUẤT</div>', unsafe_allow_html=True)
     
-    # 1.1 Doanh thu
-    st.markdown('**Doanh thu & Đóng góp của Hub (Tỷ VNĐ)**')
-    months = ['T1', 'T2', 'T3', 'T4', 'T5', 'T6'] 
-    data_rev = {
-        'Tháng': months * 4,
-        'Hub': sorted(['HO & ĐNB', 'Miền Bắc', 'Miền Trung', 'Miền Tây'] * 6),
-        'Doanh Thu': [150, 160, 140, 180, 200, 210, 50, 55, 45, 60, 70, 80, 40, 42, 38, 50, 55, 60, 20, 22, 18, 25, 30, 35]        
-    }
-    df_rev = pd.DataFrame(data_rev)
-    fig_rev = px.bar(df_rev, x="Tháng", y="Doanh Thu", color="Hub", title="", text_auto=True, color_discrete_map=COLOR_MAP)
-    fig_rev.update_traces(textposition='inside', textfont_color='white') 
-    st.plotly_chart(fig_rev, use_container_width=True)
-
-    # 1.2 % Hoàn thành Kế hoạch
+    # --- VỊ TRÍ 1: TỶ LỆ HOÀN THÀNH KẾ HOẠCH (ĐƯA LÊN ĐẦU) ---
     st.markdown('**Tỷ lệ Hoàn thành Kế hoạch (Target = 100%)**')
     entities = ['Toàn Cty', 'HO & ĐNB', 'Miền Bắc', 'Miền Trung', 'Miền Tây']
     act_rev_pct = [0.95, 1.05, 0.90, 0.85, 0.60]
@@ -91,10 +78,23 @@ with top_left:
                           shapes=[dict(type="line", xref="paper", x0=0, x1=1, yref="y", y0=1, y1=1, line=dict(color="red", width=2, dash="dash"))])
     st.plotly_chart(fig_kpi, use_container_width=True)
 
+    # --- VỊ TRÍ 2: DOANH THU THỰC TẾ (ĐƯA XUỐNG DƯỚI) ---
+    st.markdown('**Doanh thu & Đóng góp của Hub (Tỷ VNĐ)**')
+    months = ['T1', 'T2', 'T3', 'T4', 'T5', 'T6'] 
+    data_rev = {
+        'Tháng': months * 4,
+        'Hub': sorted(['HO & ĐNB', 'Miền Bắc', 'Miền Trung', 'Miền Tây'] * 6),
+        'Doanh Thu': [150, 160, 140, 180, 200, 210, 50, 55, 45, 60, 70, 80, 40, 42, 38, 50, 55, 60, 20, 22, 18, 25, 30, 35]        
+    }
+    df_rev = pd.DataFrame(data_rev)
+    fig_rev = px.bar(df_rev, x="Tháng", y="Doanh Thu", color="Hub", title="", text_auto=True, color_discrete_map=COLOR_MAP)
+    fig_rev.update_traces(textposition='inside', textfont_color='white') 
+    st.plotly_chart(fig_rev, use_container_width=True)
+
 with top_right:
     st.markdown('<div class="header-style">2. TÀI CHÍNH</div>', unsafe_allow_html=True)
     
-    # 2.2 Sparkline (CSS Số To Số Nhỏ)
+    # 2.2 Sparkline
     st.markdown("""
         <div class="metric-container">
             <div class="metric-label">Biên Lợi Nhuận Ròng</div>
@@ -141,7 +141,7 @@ with top_right:
     st.plotly_chart(fig_waterfall, use_container_width=True)
 
 # ==============================================================================
-# HÀNG 2: THỊ TRƯỜNG & KHÁCH HÀNG (ĐÃ SWAP VỊ TRÍ)
+# HÀNG 2: THỊ TRƯỜNG & KHÁCH HÀNG (ĐÃ SWAP VỊ TRÍ ROI & RMS NHƯ YÊU CẦU TRƯỚC)
 # ==============================================================================
 st.markdown('<div class="header-style">3. THỊ TRƯỜNG & KHÁCH HÀNG</div>', unsafe_allow_html=True)
 mid_1, mid_2, mid_3 = st.columns(3)
