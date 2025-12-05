@@ -37,7 +37,7 @@ st.sidebar.image("https://www.vietravel.com/Content/img/logo_en.png", width=200)
 st.sidebar.header("BỘ LỌC DỮ LIỆU")
 filter_period = st.sidebar.selectbox("Giai đoạn:", ["Tháng 11/2025", "Quý 4/2025", "Năm 2025"])
 
-c_logo_top, c_title_top = st.columns([1, 5])
+c_logo_top, c_title_top = st.columns([1, 8])
 with c_logo_top:
     # Nếu muốn logo hiện cả ở đây thì uncomment dòng dưới
     st.image("https://www.vietravel.com/Content/img/logo_en.png", width=250)
