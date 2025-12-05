@@ -32,7 +32,7 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# --- SIDEBAR ---
+# --- SIDEBAR (ĐÃ CẬP NHẬT LOGO CHÍNH THỨC) ---
 st.sidebar.image("https://www.vietravel.com/Content/img/logo_en.png", width=200)
 st.sidebar.header("BỘ LỌC DỮ LIỆU")
 filter_period = st.sidebar.selectbox("Giai đoạn:", ["Tháng 11/2025", "Quý 4/2025", "Năm 2025"])
@@ -47,7 +47,7 @@ top_left, top_right = st.columns([1.8, 1.2])
 with top_left:
     st.markdown('<div class="header-style">1. KINH DOANH: DOANH THU & HIỆU SUẤT</div>', unsafe_allow_html=True)
     
-    # 1.1 TỶ LỆ HOÀN THÀNH KẾ HOẠCH (ƯU TIÊN)
+    # --- VỊ TRÍ 1: TỶ LỆ HOÀN THÀNH KẾ HOẠCH (ƯU TIÊN) ---
     st.markdown('**Tỷ lệ Hoàn thành Kế hoạch (Target = 100%)**')
     entities = ['Toàn Cty', 'HO & ĐNB', 'Miền Bắc', 'Miền Trung', 'Miền Tây']
     act_rev_pct = [0.95, 1.05, 0.90, 0.85, 0.60]
@@ -78,7 +78,7 @@ with top_left:
                           shapes=[dict(type="line", xref="paper", x0=0, x1=1, yref="y", y0=1, y1=1, line=dict(color="red", width=2, dash="dash"))])
     st.plotly_chart(fig_kpi, use_container_width=True)
 
-    # 1.2 DOANH THU THỰC TẾ
+    # --- VỊ TRÍ 2: DOANH THU THỰC TẾ ---
     st.markdown('**Doanh thu & Đóng góp của Hub (Tỷ VNĐ)**')
     months = ['T1', 'T2', 'T3', 'T4', 'T5', 'T6'] 
     data_rev = {
@@ -141,7 +141,7 @@ with top_right:
     st.plotly_chart(fig_waterfall, use_container_width=True)
 
 # ==============================================================================
-# HÀNG 2: THỊ TRƯỜNG & KHÁCH HÀNG (3 CỘT: CẤU TRÚC - CLV - TĂNG TRƯỞNG)
+# HÀNG 2: THỊ TRƯỜNG & KHÁCH HÀNG
 # ==============================================================================
 st.markdown('<div class="header-style">3. THỊ TRƯỜNG & KHÁCH HÀNG</div>', unsafe_allow_html=True)
 mid_1, mid_2, mid_3 = st.columns(3)
@@ -167,21 +167,7 @@ with mid_2:
     st.plotly_chart(fig_clv, use_container_width=True)
 
 with mid_3:
-    # --- TĂNG TRƯỞNG (ĐÃ ĐƯA LÊN ĐÂY) ---
-    st.markdown('**Tăng trưởng (%)**')
-    fig_growth = go.Figure()
-    fig_growth.add_trace(go.Bar(name='Vietravel', x=['Q1', 'Q2', 'Q3'], y=[15, 20, 25], marker_color='#0051a3', text=[15, 20, 25], textposition='auto'))
-    fig_growth.add_trace(go.Scatter(name='Ngành', x=['Q1', 'Q2', 'Q3'], y=[10, 12, 10], mode='lines+markers+text', text=[10, 12, 10], textposition='top center', line=dict(color='red')))
-    st.plotly_chart(fig_growth, use_container_width=True)
-
-# ==============================================================================
-# HÀNG 3: PHÂN TÍCH CHUYÊN SÂU (2 CỘT LỚN: ROI & RMS)
-# ==============================================================================
-st.markdown('<div class="header-style">4. PHÂN TÍCH CHUYÊN SÂU</div>', unsafe_allow_html=True)
-mid_4, mid_5 = st.columns(2)
-
-with mid_4:
-    # --- ROI MARKETING (ĐÃ CHUYỂN XUỐNG ĐÂY - 50% CHIỀU RỘNG) ---
+    # --- ROI MARKETING (VỊ TRÍ MỚI: CỘT 3 HÀNG GIỮA) ---
     st.markdown('**ROI Marketing (Tỷ VNĐ)**')
     df_mkt = pd.DataFrame({
         "Kênh": ["Facebook", "Google", "Tiktok", "Event", "Báo chí"],
@@ -192,8 +178,18 @@ with mid_4:
     fig_mkt.update_traces(textposition='top left')
     st.plotly_chart(fig_mkt, use_container_width=True)
 
+# HÀNG 2.5: CÁC BIỂU ĐỒ LỚN (CHIỀU RỘNG 50%)
+mid_4, mid_5 = st.columns(2)
+
+with mid_4:
+    st.markdown('**Tăng trưởng (%)**')
+    fig_growth = go.Figure()
+    fig_growth.add_trace(go.Bar(name='Vietravel', x=['Q1', 'Q2', 'Q3'], y=[15, 20, 25], marker_color='#0051a3', text=[15, 20, 25], textposition='auto'))
+    fig_growth.add_trace(go.Scatter(name='Ngành', x=['Q1', 'Q2', 'Q3'], y=[10, 12, 10], mode='lines+markers+text', text=[10, 12, 10], textposition='top center', line=dict(color='red')))
+    st.plotly_chart(fig_growth, use_container_width=True)
+
 with mid_5:
-    # --- RMS THỊ PHẦN (ĐÃ CHUYỂN VỀ ĐÂY - 50% CHIỀU RỘNG) ---
+    # --- RMS THỊ PHẦN (VỊ TRÍ MỚI: CỘT 5 HÀNG DƯỚI) ---
     st.markdown('**Thị phần tương đối (Theo Lượt Khách)**')
     st.caption("RMS = Khách Vietravel / Khách Đối thủ. Bóng to = Đông khách.")
     
@@ -201,7 +197,7 @@ with mid_5:
         "Tuyến": ["Đông Bắc Á", "Âu Úc Mỹ", "Đông Nam Á", "Nội địa"],
         "RMS Index": [0.8, 1.2, 1.5, 0.9],
         "Tăng trưởng": [15, 10, 5, 8],
-        "Lượt khách": [15000, 8000, 25000, 40000] 
+        "Lượt khách": [15000, 8000, 25000, 40000]
     })
     
     df_bubble["Vị thế"] = df_bubble["RMS Index"].apply(lambda x: "Dẫn đầu" if x > 1 else "Theo sau")
@@ -217,9 +213,9 @@ with mid_5:
     st.plotly_chart(fig_bubble, use_container_width=True)
 
 # ==============================================================================
-# HÀNG 4: NHÂN SỰ
+# HÀNG 3: NHÂN SỰ
 # ==============================================================================
-st.markdown('<div class="header-style">5. NHÂN SỰ & QUẢN TRỊ RỦI RO</div>', unsafe_allow_html=True)
+st.markdown('<div class="header-style">4. NHÂN SỰ & QUẢN TRỊ RỦI RO</div>', unsafe_allow_html=True)
 bot_1, bot_2, bot_3 = st.columns(3)
 
 with bot_1:
