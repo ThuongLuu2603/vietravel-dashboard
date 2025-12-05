@@ -5,172 +5,211 @@ import pandas as pd
 import numpy as np
 
 # --- CẤU HÌNH TRANG ---
-st.set_page_config(layout="wide", page_title="Vietravel Executive Dashboard")
+st.set_page_config(layout="wide", page_title="Vietravel Strategic Dashboard")
 
-# CSS tùy chỉnh để làm đẹp giao diện (Style Vietravel)
+# CSS Style Vietravel
 st.markdown("""
 <style>
-    .metric-card {background-color: #f0f2f6; padding: 15px; border-radius: 10px; border-left: 5px solid #0051a3;}
-    .big-font {font-size: 24px !important; font-weight: bold; color: #0051a3;}
-    .header-style {font-size: 20px; font-weight: bold; margin-bottom: 10px; color: #ffcd00; background-color: #0051a3; padding: 5px 10px; border-radius: 5px;}
+    .header-style {font-size: 22px; font-weight: bold; margin-top: 20px; margin-bottom: 10px; color: #ffcd00; background-color: #0051a3; padding: 8px 15px; border-radius: 5px;}
+    .sub-header {font-size: 18px; font-weight: bold; color: #0051a3; border-bottom: 2px solid #ffcd00; margin-bottom: 10px;}
+    .big-number {font-size: 36px; font-weight: bold; color: #2ca02c;}
+    .metric-label {font-size: 16px; color: #555;}
 </style>
 """, unsafe_allow_html=True)
 
-# --- TIÊU ĐỀ ---
-st.title("🚁 VIETRAVEL EXECUTIVE DASHBOARD - CHIẾN LƯỢC TOÀN CÔNG TY")
-st.markdown("---")
+# --- SIDEBAR FILTERS (Theo yêu cầu mục Bố cục) ---
+st.sidebar.image("https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/Vietravel_Logo.png/1200px-Vietravel_Logo.png", width=200) # Logo giả lập
+st.sidebar.header("BỘ LỌC DỮ LIỆU")
+filter_period = st.sidebar.selectbox("Giai đoạn:", ["Tháng 11/2025", "Quý 4/2025", "Năm 2025"])
+filter_hub = st.sidebar.multiselect("Đơn vị Kinh doanh (Hub):", ["Toàn Cty", "HO & ĐNB", "Miền Bắc", "Miền Trung", "Miền Tây"], default=["Toàn Cty", "HO & ĐNB"])
+
+st.title(f"DASHBOARD CHIẾN LƯỢC VIETRAVEL - {filter_period}")
 
 # ==============================================================================
-# PHẦN 1: MẢNG KINH DOANH (BUSINESS PERFORMANCE)
+# HÀNG 1: TOP LEFT & TOP RIGHT (THEO BỐ CỤC CHỮ F)
 # ==============================================================================
-st.markdown('<div class="header-style">1. KINH DOANH: HIỆU SUẤT & THỊ PHẦN</div>', unsafe_allow_html=True)
 
-# --- 1.1 KEY METRICS (Số to đầu bảng) ---
-col1, col2, col3, col4 = st.columns(4)
+# Tạo 2 cột lớn: Trái (Kinh doanh) - Phải (Tài chính)
+top_left, top_right = st.columns([1.8, 1.2])
 
-with col1:
-    st.metric(label="Tổng Doanh Thu (YTD)", value="5,200 Tỷ", delta="12% vs YoY")
-with col2:
-    st.metric(label="Tổng Lượt Khách (Pax)", value="850,000", delta="8% vs YoY")
-with col3:
-    st.metric(label="Thị Phần Tương Đối (SoS)", value="1.5x", delta="Dẫn đầu")
-with col4:
-    st.metric(label="% Hoàn Thành KH Năm", value="92%", delta="Tiến độ tốt")
-
-st.markdown("###") # Khoảng cách
-
-# --- 1.2 BIỂU ĐỒ GROUPED STACKED BAR (Cái quan trọng nhất) ---
-# Dữ liệu giả lập
-hubs = ['Toàn Cty', 'HO & ĐNB', 'Miền Bắc', 'Miền Trung', 'Miền Tây']
-# % Thực đạt (Actual)
-act_pax = [0.95, 1.05, 0.90, 0.60, 0.45]
-act_rev = [0.92, 1.10, 0.95, 0.65, 0.50]
-act_gp  = [0.88, 1.12, 0.60, 1.05, 0.30]
-
-fig_trinity = go.Figure()
-
-def add_stacked_group(fig, name, actuals, color_solid, color_gap, offset):
-    # Phần thực đạt
-    fig.add_trace(go.Bar(
-        name=name, x=hubs, y=[min(x, 1.0) for x in actuals],
-        marker_color=color_solid, offsetgroup=offset, legendgroup=name,
-        text=[f"{x:.0%}" for x in actuals], textposition='auto'
-    ))
-    # Phần Gap (Thiếu)
-    gaps = [max(1.0 - x, 0) for x in actuals]
-    fig.add_trace(go.Bar(
-        name=name + " (Gap)", x=hubs, y=gaps,
-        marker_color=color_gap, offsetgroup=offset, base=[min(x, 1.0) for x in actuals],
-        legendgroup=name, showlegend=False, hoverinfo="skip"
-    ))
-    # Phần Vượt (Over)
-    over = [max(x - 1.0, 0) for x in actuals]
-    fig.add_trace(go.Bar(
-        name=name + " (Vượt)", x=hubs, y=over,
-        marker_color='#32CD32', offsetgroup=offset, base=1.0,
-        legendgroup=name, showlegend=False
-    ))
-
-# Thêm 3 nhóm cột
-add_stacked_group(fig_trinity, "Khách (Pax)", act_pax, '#1f77b4', '#aec7e8', 0)
-add_stacked_group(fig_trinity, "Doanh thu", act_rev, '#ff7f0e', '#ffbb78', 1)
-add_stacked_group(fig_trinity, "Lãi gộp", act_gp, '#9467bd', '#c5b0d5', 2)
-
-fig_trinity.update_layout(
-    title_text="<b>BỘ 3 CHỈ SỐ HIỆU SUẤT (Performance Trinity)</b> - So sánh Thực tế vs Kế hoạch (100%)",
-    yaxis_title="% Hoàn thành Kế hoạch",
-    yaxis_tickformat=".0%",
-    barmode='group',
-    height=500,
-    shapes=[dict(type="line", xref="paper", x0=0, x1=1, yref="y", y0=1, y1=1, line=dict(color="red", width=2, dash="dash"))]
-)
-
-st.plotly_chart(fig_trinity, use_container_width=True)
-
-
-# --- 1.3 DOANH THU THEO THÁNG & CƠ CẤU (Bố cục chia đôi) ---
-c1, c2 = st.columns(2)
-
-with c1:
-    # Standard Stacked Bar (Doanh thu theo tháng & Hub)
-    df_rev = pd.DataFrame({
-        "Tháng": ["T1", "T2", "T3", "T4", "T5", "T6"] * 4,
-        "Hub": ["HO"]*6 + ["Bắc"]*6 + ["Trung"]*6 + ["Tây"]*6,
-        "Doanh thu": np.random.randint(20, 100, 24)
-    })
-    fig_rev = px.bar(df_rev, x="Tháng", y="Doanh thu", color="Hub", title="<b>Xu hướng Doanh thu & Đóng góp của Hub</b>", text_auto=True)
+with top_left:
+    st.markdown('<div class="header-style">1. KINH DOANH: DOANH THU & HIỆU SUẤT</div>', unsafe_allow_html=True)
+    
+    # 1.1 Doanh thu & Lượt khách (Standard Stacked Bar)
+    # [Source: 19] Trục hoành tháng, Trục tung tổng doanh thu, Lớp chồng là Hub
+    st.markdown('<p class="sub-header">Doanh thu & Đóng góp của Hub (Tỷ VNĐ)</p>', unsafe_allow_html=True)
+    months = ['T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'T8', 'T9', 'T10', 'T11', 'T12']
+    hubs_list = ['HO & ĐNB', 'Miền Bắc', 'Miền Trung', 'Miền Tây']
+    data_rev = {
+        'Tháng': months * 4,
+        'Hub': sorted(hubs_list * 12),
+        'Doanh Thu': np.random.randint(50, 200, 48) # Dữ liệu giả lập
+    }
+    df_rev = pd.DataFrame(data_rev)
+    fig_rev = px.bar(df_rev, x="Tháng", y="Doanh Thu", color="Hub", 
+                     title="Doanh thu thực tế theo Tháng (Standard Stacked Bar)",
+                     color_discrete_sequence=['#0051a3', '#d62728', '#ffcd00', '#2ca02c']) # Xanh, Đỏ, Vàng, Lá
     st.plotly_chart(fig_rev, use_container_width=True)
 
-with c2:
-    # Combo Chart (Tăng trưởng so với ngành)
-    months = ["T1", "T2", "T3", "T4", "T5", "T6"]
-    y_vietravel = [15, 12, 20, 18, 22, 25]
-    y_industry = [10, 8, 15, 12, 10, 12]
+    # 1.2 % Hoàn thành Kế hoạch (Grouped Stacked Bar - QUAN TRỌNG NHẤT)
+    # [Source: 19] Trục tung %, 5 nhóm (Cty + 4 Hub), mỗi nhóm 3 cột (DT/Pax/Lãi)
+    st.markdown('<p class="sub-header">Tỷ lệ Hoàn thành Kế hoạch (Bộ 3 Chỉ số)</p>', unsafe_allow_html=True)
     
-    fig_growth = go.Figure()
-    fig_growth.add_trace(go.Bar(name='Vietravel Growth (%)', x=months, y=y_vietravel, marker_color='#0051a3'))
-    fig_growth.add_trace(go.Scatter(name='Ngành Du lịch (%)', x=months, y=y_industry, mode='lines+markers', line=dict(color='red', width=3)))
-    fig_growth.update_layout(title="<b>Tốc độ Tăng trưởng: Vietravel vs Ngành</b>")
-    st.plotly_chart(fig_growth, use_container_width=True)
+    entities = ['Toàn Cty', 'HO & ĐNB', 'Miền Bắc', 'Miền Trung', 'Miền Tây']
+    # Dữ liệu % thực đạt (Actual)
+    act_rev_pct = [0.95, 1.05, 0.90, 0.85, 0.60]
+    act_pax_pct = [0.98, 1.10, 0.95, 0.80, 0.50]
+    act_gp_pct  = [0.88, 1.15, 0.65, 0.90, 0.40]
 
-# ==============================================================================
-# PHẦN 2: MẢNG TÀI CHÍNH (FINANCIAL HEALTH)
-# ==============================================================================
-st.markdown('<div class="header-style">2. TÀI CHÍNH: LỢI NHUẬN & DÒNG TIỀN</div>', unsafe_allow_html=True)
+    fig_kpi = go.Figure()
+    
+    def add_kpi_group(name, values, color_solid, color_gap, offset_group):
+        # Vẽ phần thực đạt
+        fig_kpi.add_trace(go.Bar(name=name, x=entities, y=[min(v, 1.0) for v in values],
+                                 marker_color=color_solid, offsetgroup=offset_group, legendgroup=name,
+                                 text=[f"{v:.0%}" for v in values], textposition='auto'))
+        # Vẽ phần Gap (Thiếu)
+        gaps = [max(1.0 - v, 0) for v in values]
+        fig_kpi.add_trace(go.Bar(name=name+" Gap", x=entities, y=gaps,
+                                 marker_color=color_gap, offsetgroup=offset_group, base=[min(v, 1.0) for v in values],
+                                 legendgroup=name, showlegend=False, hoverinfo='skip'))
+        # Vẽ phần Vượt
+        overs = [max(v - 1.0, 0) for v in values]
+        fig_kpi.add_trace(go.Bar(name=name+" Vượt", x=entities, y=overs,
+                                 marker_color='#32CD32', offsetgroup=offset_group, base=1.0,
+                                 legendgroup=name, showlegend=False))
 
-f1, f2 = st.columns(2)
+    add_kpi_group("Doanh thu", act_rev_pct, '#1f77b4', '#aec7e8', 0)
+    add_kpi_group("Lượt khách", act_pax_pct, '#ff7f0e', '#ffbb78', 1)
+    add_kpi_group("Lãi gộp", act_gp_pct, '#9467bd', '#c5b0d5', 2)
 
-with f1:
-    # Waterfall Chart (Dòng tiền)
-    fig_cash = go.Figure(go.Waterfall(
-        name = "Cashflow", orientation = "v",
-        measure = ["relative", "relative", "total", "relative", "relative", "total"],
-        x = ["Đầu kỳ", "Thu Tour", "Tiền mặt sẵn có", "Chi trả NCC", "Chi phí HĐ", "Cuối kỳ"],
-        textposition = "outside",
-        text = ["+100", "+500", "600", "-300", "-150", "150"],
-        y = [100, 500, 0, -300, -150, 0],
-        connector = {"line":{"color":"rgb(63, 63, 63)"}},
-    ))
-    fig_cash.update_layout(title = "<b>Dòng tiền Tự do (Operating Cash Flow)</b>")
-    st.plotly_chart(fig_cash, use_container_width=True)
+    fig_kpi.update_layout(barmode='group', yaxis_tickformat='.0%', 
+                          title="Mức độ hoàn thành mục tiêu (Target = 100%)",
+                          shapes=[dict(type="line", xref="paper", x0=0, x1=1, yref="y", y0=1, y1=1, line=dict(color="red", width=2, dash="dash"))])
+    st.plotly_chart(fig_kpi, use_container_width=True)
 
-with f2:
-    # EBITDA Combo Chart
+with top_right:
+    st.markdown('<div class="header-style">2. TÀI CHÍNH: LỢI NHUẬN & DÒNG TIỀN</div>', unsafe_allow_html=True)
+    
+    # 2.2 Biên lợi nhuận ròng (Big Number + Sparkline) [Source: 22]
+    # Mô phỏng hiển thị Big Number
+    st.markdown("""
+        <div style="background-color: #f0f2f6; padding: 10px; border-radius: 10px; text-align: center;">
+            <p class="metric-label">Biên Lợi Nhuận Ròng (Net Margin)</p>
+            <p class="big-number">8.5% <span style="font-size: 20px; color: green;">▲ 0.5%</span></p>
+        </div>
+    """, unsafe_allow_html=True)
+    # Vẽ Sparkline nhỏ bên dưới
+    spark_data = [5, 6, 5.5, 7, 8, 8.5]
+    fig_spark = px.line(x=list(range(6)), y=spark_data, height=100)
+    fig_spark.update_xaxes(visible=False).update_yaxes(visible=False).update_layout(margin=dict(l=0, r=0, t=0, b=0))
+    st.plotly_chart(fig_spark, use_container_width=True)
+
+    # 2.1 EBITDA (Combo Chart) [Source: 22]
+    st.markdown('<p class="sub-header">EBITDA & Margin</p>', unsafe_allow_html=True)
     fig_ebitda = go.Figure()
-    fig_ebitda.add_trace(go.Bar(name='EBITDA (Tỷ)', x=months, y=[20, 25, 15, 30, 35, 40], marker_color='#2ca02c'))
-    fig_ebitda.add_trace(go.Scatter(name='EBITDA Margin (%)', x=months, y=[5, 6, 4, 7, 8, 9], yaxis='y2', line=dict(color='orange')))
-    fig_ebitda.update_layout(
-        title="<b>Hiệu quả vận hành: EBITDA & Margin</b>",
-        yaxis=dict(title="Giá trị (Tỷ VNĐ)"),
-        yaxis2=dict(title="Margin (%)", overlaying='y', side='right')
-    )
+    fig_ebitda.add_trace(go.Bar(name='EBITDA (Tỷ)', x=months[:6], y=[25, 30, 20, 40, 45, 50], marker_color='#2ca02c'))
+    fig_ebitda.add_trace(go.Scatter(name='% Margin', x=months[:6], y=[10, 12, 8, 15, 16, 18], yaxis='y2', line=dict(color='orange', width=3)))
+    fig_ebitda.update_layout(yaxis2=dict(overlaying='y', side='right', range=[0, 30]), legend=dict(orientation="h", y=1.1))
     st.plotly_chart(fig_ebitda, use_container_width=True)
 
+    # 2.3 Dòng tiền tự do (Waterfall) [Source: 22]
+    st.markdown('<p class="sub-header">Dòng tiền tự do (Cashflow)</p>', unsafe_allow_html=True)
+    fig_waterfall = go.Figure(go.Waterfall(
+        name="Cashflow", orientation="v",
+        measure=["relative", "relative", "total", "relative", "relative", "total"],
+        x=["Đầu kỳ", "Thu Tour", "Tiền mặt", "Trả NCC", "Chi phí", "Cuối kỳ"],
+        y=[200, 800, 0, -400, -250, 0],
+        connector={"line": {"color": "rgb(63, 63, 63)"}}
+    ))
+    st.plotly_chart(fig_waterfall, use_container_width=True)
+
 # ==============================================================================
-# PHẦN 3: MẢNG NHÂN SỰ (HUMAN CAPITAL)
+# HÀNG 2: KHU VỰC GIỮA (THỊ TRƯỜNG & KHÁCH HÀNG) [Source: 19, 31]
 # ==============================================================================
-st.markdown('<div class="header-style">3. NHÂN SỰ: NĂNG SUẤT & KẾ THỪA</div>', unsafe_allow_html=True)
+st.markdown('<div class="header-style">3. THỊ TRƯỜNG & KHÁCH HÀNG</div>', unsafe_allow_html=True)
 
-h1, h2 = st.columns([1, 2])
+mid_1, mid_2, mid_3 = st.columns(3)
 
-with h1:
-    # Heatmap (Đội ngũ kế thừa)
-    data_succession = [[100, 80, 0], [100, 50, 20], [100, 100, 100]]
-    fig_heat = px.imshow(data_succession, 
-                        labels=dict(x="Cấp bậc", y="Khu vực", color="% Sẵn sàng"),
-                        x=['Trưởng phòng', 'Phó GĐ', 'Giám đốc'],
-                        y=['Miền Tây', 'Miền Bắc', 'HO'],
-                        color_continuous_scale='RdYlGn',
-                        title="<b>Bản đồ nhiệt: Độ sẵn sàng đội ngũ kế thừa</b>")
-    st.plotly_chart(fig_heat, use_container_width=True)
-
-with h2:
-    # Trend Line (Lợi nhuận/Nhân viên)
-    df_prod = pd.DataFrame({
-        "Năm": [2021, 2022, 2023, 2024, 2025],
-        "Vietravel": [100, 150, 300, 450, 500],
-        "TB Ngành": [100, 120, 200, 250, 300]
+with mid_1:
+    # 3.1 Cấu trúc thị trường (100% Stacked Bar theo năm) [Source: 19]
+    st.markdown('**Cấu trúc Doanh thu theo Năm**')
+    df_market = pd.DataFrame({
+        "Năm": ["2023", "2023", "2023", "2024", "2024", "2024", "2025", "2025", "2025"],
+        "Mảng": ["Inbound", "Outbound", "Domestic"] * 3,
+        "Tỷ trọng": [20, 50, 30, 25, 45, 30, 30, 40, 30]
     })
-    fig_prod = px.line(df_prod, x="Năm", y=["Vietravel", "TB Ngành"], markers=True, 
-                      title="<b>Năng suất lao động: Lợi nhuận/Nhân sự (Triệu VNĐ)</b>")
-    st.plotly_chart(fig_prod, use_container_width=True)
+    fig_market = px.bar(df_market, x="Năm", y="Tỷ trọng", color="Mảng", title="", text_auto=True)
+    st.plotly_chart(fig_market, use_container_width=True)
+
+with mid_2:
+    # 3.2 CLV vs CAC (Dual Line Chart) [Source: 19]
+    st.markdown('**CLV (Giá trị KH) vs CAC (Chi phí sở hữu)**')
+    fig_clv = go.Figure()
+    fig_clv.add_trace(go.Scatter(name='CLV (Giá trị)', x=['Q1', 'Q2', 'Q3', 'Q4'], y=[10, 12, 15, 18], mode='lines+markers'))
+    fig_clv.add_trace(go.Scatter(name='CAC (Chi phí)', x=['Q1', 'Q2', 'Q3', 'Q4'], y=[5, 5.5, 5, 4.5], mode='lines+markers', line=dict(dash='dot')))
+    fig_clv.update_layout(title="Mục tiêu: Khoảng cách càng doãng ra càng tốt")
+    st.plotly_chart(fig_clv, use_container_width=True)
+
+with mid_3:
+    # 3.3 Thị phần tương đối (Bubble Chart) [Source: 19]
+    st.markdown('**Thị phần tương đối (Bubble Chart)**')
+    # X: Thị phần, Y: Tăng trưởng, Size: Doanh thu
+    df_bubble = pd.DataFrame({
+        "Tuyến": ["Đông Bắc Á", "Âu Úc Mỹ", "Đông Nam Á", "Nội địa"],
+        "Thị phần (%)": [35, 20, 40, 25],
+        "Tăng trưởng (%)": [15, 10, 5, 8],
+        "Doanh thu": [500, 800, 300, 400]
+    })
+    fig_bubble = px.scatter(df_bubble, x="Thị phần (%)", y="Tăng trưởng (%)", size="Doanh thu", color="Tuyến",
+                            hover_name="Tuyến", size_max=60)
+    st.plotly_chart(fig_bubble, use_container_width=True)
+
+mid_4, mid_5 = st.columns(2)
+with mid_4:
+    # 3.4 Tăng trưởng so với ngành (Combo Chart) [Source: 19]
+    st.markdown('**Tăng trưởng: Vietravel vs Ngành**')
+    fig_growth = go.Figure()
+    fig_growth.add_trace(go.Bar(name='Vietravel', x=['Q1', 'Q2', 'Q3'], y=[15, 20, 25]))
+    fig_growth.add_trace(go.Scatter(name='Ngành', x=['Q1', 'Q2', 'Q3'], y=[10, 12, 10], line=dict(color='red')))
+    st.plotly_chart(fig_growth, use_container_width=True)
+
+with mid_5:
+    # 3.5 Hiệu suất Marketing (Scatter Plot) [Source: 22]
+    st.markdown('**Hiệu suất đầu tư Marketing (ROI)**')
+    df_mkt = pd.DataFrame({
+        "Kênh": ["Facebook", "Google", "Tiktok", "Event", "Báo chí"],
+        "Chi phí (Tỷ)": [2, 5, 1, 3, 0.5],
+        "Doanh thu (Tỷ)": [20, 60, 15, 10, 2]
+    })
+    fig_mkt = px.scatter(df_mkt, x="Chi phí (Tỷ)", y="Doanh thu (Tỷ)", color="Kênh", size="Doanh thu (Tỷ)", text="Kênh")
+    st.plotly_chart(fig_mkt, use_container_width=True)
+
+
+# ==============================================================================
+# HÀNG 3: NHÂN SỰ & RỦI RO (BOTTOM) [Source: 25, 32]
+# ==============================================================================
+st.markdown('<div class="header-style">4. NHÂN SỰ & QUẢN TRỊ RỦI RO</div>', unsafe_allow_html=True)
+
+bot_1, bot_2, bot_3 = st.columns(3)
+
+with bot_1:
+    # 4.1 Lợi nhuận/Nhân sự (Trend Line)
+    st.markdown('**Năng suất: Lợi nhuận/Nhân viên**')
+    df_hr = pd.DataFrame({"Năm": [2023, 2024, 2025], "Vietravel": [200, 250, 300], "Ngành": [180, 200, 220]})
+    fig_hr = px.line(df_hr, x="Năm", y=["Vietravel", "Ngành"], markers=True)
+    st.plotly_chart(fig_hr, use_container_width=True)
+
+with bot_2:
+    # 4.2 Giữ chân nhân sự Key (Scorecard)
+    st.markdown('**Tỷ lệ giữ chân Key Person**')
+    st.metric(label="Retention Rate (YTD)", value="95%", delta="-2% (Cảnh báo: Miền Bắc)")
+    st.info("⚠️ Cảnh báo: 2 Giám đốc chi nhánh Miền Bắc đang có dấu hiệu rủi ro.")
+
+with bot_3:
+    # 4.3 Đội ngũ kế thừa (Heatmap)
+    st.markdown('**Độ sẵn sàng kế thừa (Heatmap)**')
+    z_data = [[100, 90, 20], [80, 50, 10], [100, 100, 80]] # Data mô phỏng
+    fig_heat = px.imshow(z_data, x=['TP', 'PGĐ', 'GĐ'], y=['Miền Tây', 'Miền Bắc', 'HO'],
+                         color_continuous_scale='RdYlGn', text_auto=True)
+    st.plotly_chart(fig_heat, use_container_width=True)
