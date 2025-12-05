@@ -183,7 +183,7 @@ op1, op2, op3, op4 = st.columns(4)
 
 with op1:
     st.markdown('<div class="chart-title">1. Chi phí Vận hành/Doanh thu</div>', unsafe_allow_html=True)
-    # FIX LỖI TEXT_AUTO CHO COMBO CHART
+    # FIX LỖI TEXT_AUTO: Thay bằng text=[]
     fig_cost = go.Figure()
     fig_cost.add_trace(go.Bar(name='Chi phí (Tỷ)', x=['Q1', 'Q2', 'Q3'], y=[40, 45, 50], marker_color='#757575', text=[40, 45, 50], textposition='auto'))
     fig_cost.add_trace(go.Scatter(name='Tỷ lệ (%)', x=['Q1', 'Q2', 'Q3'], y=[10, 11, 12], yaxis='y2', line=dict(color='red', width=3), mode='lines+markers+text', text=[10, 11, 12], textposition='top center'))
@@ -204,9 +204,25 @@ with op3:
     st.plotly_chart(fig_nps, use_container_width=True)
 
 with op4:
-    st.markdown('<div class="chart-title">4. Đổi mới (Sản phẩm mới)</div>', unsafe_allow_html=True)
-    fig_inn = go.Figure(data=[go.Pie(labels=['Cũ', 'Mới'], values=[90, 10], hole=.6, marker_colors=['#e0e0e0', '#2ca02c'])])
-    fig_inn.update_layout(annotations=[dict(text='10%', x=0.5, y=0.5, font_size=20, showarrow=False)], showlegend=True, height=250, margin=dict(l=0, r=0, t=10, b=0), legend=dict(orientation="h", y=-0.2))
+    # --- NÂNG CẤP CHỈ SỐ 7: THỂ HIỆN RÕ PIPELINE VÀ DOANH THU ---
+    st.markdown('<div class="chart-title">4. Đổi mới (Pipeline & Doanh thu)</div>', unsafe_allow_html=True)
+    
+    # Chart Funnel: Pipeline
+    fig_inn = go.Figure()
+    fig_inn.add_trace(go.Funnel(
+        name = 'Pipeline',
+        y = ["Ý tưởng", "Triển khai", "Mở bán"],
+        x = [50, 30, 10], # Số lượng sản phẩm
+        textinfo = "value+percent initial",
+        marker = {"color": ["#e0e0e0", "#b4b4b4", "#0051a3"]}
+    ))
+    
+    # Thêm Annotation số tiền Doanh thu ở góc
+    fig_inn.update_layout(
+        height=250, margin=dict(l=0, r=0, t=10, b=0),
+        showlegend=False,
+        annotations=[dict(text='DT SP Mới: 10%', x=0.5, y=0.05, font=dict(size=14, color='red', weight='bold'), showarrow=False, xref='paper', yref='paper')]
+    )
     st.plotly_chart(fig_inn, use_container_width=True)
 
 # ==============================================================================
