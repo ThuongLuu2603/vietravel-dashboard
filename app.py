@@ -35,21 +35,20 @@ with top_left:
     
     # 1.1 Doanh thu & Lượt khách [Source: 19]
     st.markdown('<p class="sub-header">Doanh thu & Đóng góp của Hub (Tỷ VNĐ)</p>', unsafe_allow_html=True)
-    months = ['T1', 'T2', 'T3', 'T4', 'T5', 'T6'] # Demo 6 tháng cho gọn
+    months = ['T1', 'T2', 'T3', 'T4', 'T5', 'T6'] 
     data_rev = {
         'Tháng': months * 4,
         'Hub': sorted(['HO & ĐNB', 'Miền Bắc', 'Miền Trung', 'Miền Tây'] * 6),
-        'Doanh Thu': [150, 160, 140, 180, 200, 210,  # HO
-                      50, 55, 45, 60, 70, 80,        # Bắc
-                      40, 42, 38, 50, 55, 60,        # Trung
-                      20, 22, 18, 25, 30, 35]        # Tây
+        'Doanh Thu': [150, 160, 140, 180, 200, 210,  
+                      50, 55, 45, 60, 70, 80,        
+                      40, 42, 38, 50, 55, 60,        
+                      20, 22, 18, 25, 30, 35]        
     }
     df_rev = pd.DataFrame(data_rev)
-    # THÊM TEXT_AUTO=TRUE ĐỂ HIỆN SỐ TUYỆT ĐỐI
     fig_rev = px.bar(df_rev, x="Tháng", y="Doanh Thu", color="Hub", 
                      title="Doanh thu thực tế (Hiển thị số liệu)", text_auto=True,
                      color_discrete_sequence=['#0051a3', '#d62728', '#ffcd00', '#2ca02c'])
-    fig_rev.update_traces(textposition='inside') # Số nằm trong cột
+    fig_rev.update_traces(textposition='inside') 
     st.plotly_chart(fig_rev, use_container_width=True)
 
     # 1.2 % Hoàn thành Kế hoạch [Source: 19]
@@ -62,10 +61,9 @@ with top_left:
     fig_kpi = go.Figure()
     
     def add_kpi_group(name, values, color_solid, color_gap, offset_group):
-        # HIỆN SỐ % TUYỆT ĐỐI TRÊN CỘT
         fig_kpi.add_trace(go.Bar(name=name, x=entities, y=[min(v, 1.0) for v in values],
                                  marker_color=color_solid, offsetgroup=offset_group, legendgroup=name,
-                                 text=[f"{v*100:.0f}%" for v in values], textposition='auto')) # Hiện số %
+                                 text=[f"{v*100:.0f}%" for v in values], textposition='auto'))
         
         gaps = [max(1.0 - v, 0) for v in values]
         fig_kpi.add_trace(go.Bar(name=name+" Gap", x=entities, y=gaps,
@@ -90,7 +88,7 @@ with top_left:
 with top_right:
     st.markdown('<div class="header-style">2. TÀI CHÍNH: LỢI NHUẬN & DÒNG TIỀN</div>', unsafe_allow_html=True)
     
-    # 2.2 Big Number
+    # 2.2 Big Number + Sparkline (YÊU CẦU 1)
     st.markdown("""
         <div style="background-color: #f0f2f6; padding: 10px; border-radius: 10px; text-align: center;">
             <p class="metric-label">Biên Lợi Nhuận Ròng (Net Margin)</p>
@@ -98,10 +96,15 @@ with top_right:
         </div>
     """, unsafe_allow_html=True)
     
+    # Vẽ Sparkline
+    spark_data = [5, 6, 5.5, 7, 8, 8.5]
+    fig_spark = px.line(x=list(range(6)), y=spark_data, height=100, title="Xu hướng 6 tháng gần nhất")
+    fig_spark.update_xaxes(visible=False).update_yaxes(visible=False).update_layout(margin=dict(l=0, r=0, t=30, b=0))
+    st.plotly_chart(fig_spark, use_container_width=True)
+    
     # 2.1 EBITDA [Source: 22]
     st.markdown('<p class="sub-header">EBITDA & Margin</p>', unsafe_allow_html=True)
     fig_ebitda = go.Figure()
-    # HIỆN SỐ TRÊN CỘT VÀ ĐIỂM
     fig_ebitda.add_trace(go.Bar(name='EBITDA (Tỷ)', x=months, y=[25, 30, 20, 40, 45, 50], 
                                 marker_color='#2ca02c', text=[25, 30, 20, 40, 45, 50], textposition='auto'))
     fig_ebitda.add_trace(go.Scatter(name='% Margin', x=months, y=[10, 12, 8, 15, 16, 18], yaxis='y2', 
@@ -116,7 +119,7 @@ with top_right:
         measure=["relative", "relative", "total", "relative", "relative", "total"],
         x=["Đầu kỳ", "Thu Tour", "Tiền mặt", "Trả NCC", "Chi phí", "Cuối kỳ"],
         y=[200, 800, 0, -400, -250, 0],
-        text=[200, 800, 1000, -400, -250, 350], # HIỆN SỐ CỤ THỂ
+        text=[200, 800, 1000, -400, -250, 350],
         textposition="outside",
         connector={"line": {"color": "rgb(63, 63, 63)"}}
     ))
@@ -134,9 +137,8 @@ with mid_1:
     df_market = pd.DataFrame({
         "Năm": ["2023", "2023", "2023", "2024", "2024", "2024", "2025", "2025", "2025"],
         "Mảng": ["Inbound", "Outbound", "Domestic"] * 3,
-        "Doanh Thu": [200, 500, 300, 250, 600, 350, 400, 800, 500] # Số liệu tuyệt đối
+        "Doanh Thu": [200, 500, 300, 250, 600, 350, 400, 800, 500]
     })
-    # TEXT_AUTO HIỆN SỐ TUYỆT ĐỐI
     fig_market = px.bar(df_market, x="Năm", y="Doanh Thu", color="Mảng", text_auto=True)
     st.plotly_chart(fig_market, use_container_width=True)
 
@@ -144,7 +146,6 @@ with mid_2:
     # 3.2 CLV vs CAC [Source: 19]
     st.markdown('**CLV vs CAC ($)**')
     fig_clv = go.Figure()
-    # MODE='LINES+MARKERS+TEXT'
     fig_clv.add_trace(go.Scatter(name='CLV', x=['Q1', 'Q2', 'Q3', 'Q4'], y=[100, 120, 150, 180], 
                                  mode='lines+markers+text', text=[100, 120, 150, 180], textposition='top left'))
     fig_clv.add_trace(go.Scatter(name='CAC', x=['Q1', 'Q2', 'Q3', 'Q4'], y=[50, 55, 50, 45], 
@@ -160,7 +161,6 @@ with mid_3:
         "Tăng trưởng": [15, 10, 5, 8],
         "Doanh thu": [500, 800, 300, 400]
     })
-    # TEXT='TUYẾN' ĐỂ HIỆN TÊN + SIZE BONG BÓNG
     fig_bubble = px.scatter(df_bubble, x="Thị phần", y="Tăng trưởng", size="Doanh thu", color="Tuyến",
                             text="Tuyến", size_max=60)
     fig_bubble.update_traces(textposition='top center')
@@ -194,11 +194,33 @@ st.markdown('<div class="header-style">4. NHÂN SỰ & QUẢN TRỊ RỦI RO</di
 bot_1, bot_2, bot_3 = st.columns(3)
 
 with bot_1:
-    # 4.1 Lợi nhuận/NS [Source: 25]
-    st.markdown('**Năng suất (Triệu/Người)**')
-    df_hr = pd.DataFrame({"Năm": [2023, 2024, 2025], "Vietravel": [200, 250, 300], "Ngành": [180, 200, 220]})
-    fig_hr = px.line(df_hr, x="Năm", y=["Vietravel", "Ngành"], markers=True, text="Vietravel") # Hiện số của Vietravel
-    fig_hr.update_traces(textposition="top left")
+    # 4.1 Lợi nhuận/NS (YÊU CẦU 2: ĐỔI THÀNH CỘT NHÓM CÓ SỐ TUYỆT ĐỐI)
+    st.markdown('**Năng suất: Lợi nhuận/Người (Triệu VNĐ)**')
+    
+    # Tạo dữ liệu cho 5 nhóm (Cty + 4 Hub) qua 3 năm
+    data_hr_bar = {
+        "Năm": ["2023", "2024", "2025"] * 5,
+        "Đơn vị": sorted(["Toàn Cty", "HO & ĐNB", "Miền Bắc", "Miền Trung", "Miền Tây"] * 3),
+        "Lợi nhuận/NS": [
+            # Cty
+            180, 200, 220,
+            # HO
+            200, 230, 250,
+            # Bắc
+            150, 170, 190,
+            # Trung
+            160, 180, 200,
+            # Tây
+            120, 130, 140
+        ]
+    }
+    df_hr_bar = pd.DataFrame(data_hr_bar)
+    
+    # Vẽ biểu đồ Grouped Bar Chart
+    fig_hr = px.bar(df_hr_bar, x="Năm", y="Lợi nhuận/NS", color="Đơn vị", 
+                    barmode='group', text_auto=True, # Hiển thị số tuyệt đối
+                    title="So sánh năng suất nhân sự qua các năm")
+    fig_hr.update_traces(textposition='outside') # Số nằm trên đầu cột cho dễ đọc
     st.plotly_chart(fig_hr, use_container_width=True)
 
 with bot_2:
@@ -214,5 +236,5 @@ with bot_3:
     st.markdown('**Sẵn sàng kế thừa (%)**')
     z_data = [[100, 90, 20], [80, 50, 10], [100, 100, 80]]
     fig_heat = px.imshow(z_data, x=['TP', 'PGĐ', 'GĐ'], y=['Miền Tây', 'Miền Bắc', 'HO'],
-                         color_continuous_scale='RdYlGn', text_auto=True) # Text_auto hiện số trong ô
+                         color_continuous_scale='RdYlGn', text_auto=True) 
     st.plotly_chart(fig_heat, use_container_width=True)
