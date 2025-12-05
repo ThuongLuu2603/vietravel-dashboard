@@ -119,8 +119,7 @@ with top_right:
         name="Cashflow", orientation="v",
         measure=["relative", "relative", "total", "relative", "relative", "total"],
         x=["Đầu kỳ", "Thu Tour", "Tiền mặt", "Trả NCC", "Chi phí", "Cuối kỳ"],
-        y=[200, 800, 0, -400, -250, 0], text=[200, 800, 1000, -400, -250, 350],
-        textposition="outside", connector={"line": {"color": "rgb(63, 63, 63)"}}
+        y=[200, 800, 0, -400, -250, 0], text=[200, 800, 1000, -400, -250, 350],textposition="outside", connector={"line": {"color": "rgb(63, 63, 63)"}}
     ))
     fig_waterfall.update_layout(margin=dict(t=20, b=20),, height=250)
     st.plotly_chart(fig_waterfall, use_container_width=True)
