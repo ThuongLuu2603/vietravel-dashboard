@@ -7,21 +7,23 @@ import numpy as np
 # --- CẤU HÌNH TRANG ---
 st.set_page_config(layout="wide", page_title="Vietravel Strategic Dashboard")
 
-# --- ĐỊNH NGHĨA BẢNG MÀU CHIẾN LƯỢC (CONSISTENT PALETTE) ---
-# Đây là bí quyết để Dashboard nhìn chuyên nghiệp: Màu sắc mang ý nghĩa
+# --- ĐỊNH NGHĨA BẢNG MÀU CHIẾN LƯỢC (ĐÃ THÊM MÀU CHO TUYẾN) ---
 COLOR_MAP = {
-    "Toàn Cty": "#333333",    # Màu đen xám (Tổng thể)
-    "HO & ĐNB": "#0051a3",    # Xanh Vietravel (Trụ cột)
-    "Miền Bắc": "#d62728",    # Đỏ (Nổi bật)
-    "Miền Trung": "#ffcd00",  # Vàng (Di sản)
-    "Miền Tây": "#2ca02c",    # Xanh lá (Sông nước)
+    # Hubs
+    "Toàn Cty": "#333333",
+    "HO & ĐNB": "#0051a3",    # Xanh Vietravel
+    "Miền Bắc": "#d62728",    # Đỏ
+    "Miền Trung": "#ffcd00",  # Vàng
+    "Miền Tây": "#2ca02c",    # Xanh lá
     # Các mảng kinh doanh
-    "Inbound": "#17becf",     # Xanh ngọc
-    "Outbound": "#0051a3",    # Xanh hiệu
-    "Domestic": "#ff7f0e",    # Cam
-    # Trạng thái
-    "Dẫn đầu": "#2ca02c",     # Xanh lá
-    "Theo sau": "#d62728"     # Đỏ
+    "Inbound": "#17becf", "Outbound": "#0051a3", "Domestic": "#ff7f0e",
+    # MÀU CHO CÁC TUYẾN (CẬP NHẬT MỚI)
+    "Đông Bắc Á": "#9467bd",  # Tím (Trendy)
+    "Âu Úc Mỹ": "#1f77b4",    # Xanh dương (Sang trọng)
+    "Đông Nam Á": "#ff7f0e",  # Cam (Năng động)
+    "Nội địa": "#2ca02c",     # Xanh lá (Việt Nam)
+    # Kênh Marketing
+    "Facebook": "#4267B2", "Google": "#DB4437", "Tiktok": "#000000", "Event": "#FFC107", "Báo chí": "#757575"
 }
 
 # CSS Style
@@ -50,7 +52,7 @@ top_left, top_right = st.columns([1.8, 1.2])
 with top_left:
     st.markdown('<div class="header-style">1. KINH DOANH: DOANH THU & HIỆU SUẤT</div>', unsafe_allow_html=True)
     
-    # 1.1 Doanh thu (Standard Stacked Bar) - ÁP DỤNG COLOR MAP
+    # 1.1 Doanh thu
     st.markdown('**Doanh thu & Đóng góp của Hub (Tỷ VNĐ)**')
     months = ['T1', 'T2', 'T3', 'T4', 'T5', 'T6'] 
     data_rev = {
@@ -59,11 +61,7 @@ with top_left:
         'Doanh Thu': [150, 160, 140, 180, 200, 210, 50, 55, 45, 60, 70, 80, 40, 42, 38, 50, 55, 60, 20, 22, 18, 25, 30, 35]        
     }
     df_rev = pd.DataFrame(data_rev)
-    
-    # SỬ DỤNG color_discrete_map ĐỂ MÀU CỐ ĐỊNH
-    fig_rev = px.bar(df_rev, x="Tháng", y="Doanh Thu", color="Hub", 
-                     title="", text_auto=True,
-                     color_discrete_map=COLOR_MAP) # <--- MÀU CHUẨN
+    fig_rev = px.bar(df_rev, x="Tháng", y="Doanh Thu", color="Hub", title="", text_auto=True, color_discrete_map=COLOR_MAP)
     fig_rev.update_traces(textposition='inside', textfont_color='white') 
     st.plotly_chart(fig_rev, use_container_width=True)
 
@@ -90,9 +88,9 @@ with top_left:
                                  legendgroup=name, showlegend=False, 
                                  text=[f"+{v*100:.0f}%" if v>0 else "" for v in overs], textposition='outside'))
 
-    add_kpi_group("Doanh thu", act_rev_pct, '#0051a3', '#aec7e8', 0) # Xanh Vietravel
-    add_kpi_group("Lượt khách", act_pax_pct, '#ff7f0e', '#ffbb78', 1) # Cam
-    add_kpi_group("Lãi gộp", act_gp_pct, '#d62728', '#f4cccc', 2) # Đỏ
+    add_kpi_group("Doanh thu", act_rev_pct, '#0051a3', '#aec7e8', 0)
+    add_kpi_group("Lượt khách", act_pax_pct, '#ff7f0e', '#ffbb78', 1)
+    add_kpi_group("Lãi gộp", act_gp_pct, '#d62728', '#f4cccc', 2)
 
     fig_kpi.update_layout(barmode='group', yaxis_tickformat='.0%', height=450, margin=dict(t=20, b=20),
                           shapes=[dict(type="line", xref="paper", x0=0, x1=1, yref="y", y0=1, y1=1, line=dict(color="red", width=2, dash="dash"))])
@@ -101,7 +99,7 @@ with top_left:
 with top_right:
     st.markdown('<div class="header-style">2. TÀI CHÍNH</div>', unsafe_allow_html=True)
     
-    # 2.2 Sparkline (Đẹp hơn với CSS mới)
+    # 2.2 Sparkline
     st.markdown("""
         <div class="metric-container">
             <div class="metric-label">Biên Lợi Nhuận Ròng</div>
@@ -125,7 +123,7 @@ with top_right:
                             yaxis=dict(showgrid=False, visible=False, range=[4, 10]))
     st.plotly_chart(fig_spark, use_container_width=True)
     
-    # 2.1 EBITDA (Combo Chart)
+    # 2.1 EBITDA
     st.markdown('**EBITDA & Margin**')
     fig_ebitda = go.Figure()
     fig_ebitda.add_trace(go.Bar(name='EBITDA (Tỷ)', x=months, y=[25, 30, 20, 40, 45, 50], 
@@ -148,7 +146,7 @@ with top_right:
     st.plotly_chart(fig_waterfall, use_container_width=True)
 
 # ==============================================================================
-# HÀNG 2: THỊ TRƯỜNG & KHÁCH HÀNG (COLORFUL)
+# HÀNG 2: THỊ TRƯỜNG & KHÁCH HÀNG (ĐÃ SỬA BUBBLE CHART THEO YÊU CẦU)
 # ==============================================================================
 st.markdown('<div class="header-style">3. THỊ TRƯỜNG & KHÁCH HÀNG</div>', unsafe_allow_html=True)
 mid_1, mid_2, mid_3 = st.columns(3)
@@ -160,7 +158,6 @@ with mid_1:
         "Mảng": ["Inbound", "Outbound", "Domestic"] * 3,
         "Doanh Thu": [200, 500, 300, 250, 600, 350, 400, 800, 500]
     })
-    # ÁP DỤNG COLOR MAP
     fig_market = px.bar(df_market, x="Năm", y="Doanh Thu", color="Mảng", 
                         text_auto=True, color_discrete_map=COLOR_MAP)
     st.plotly_chart(fig_market, use_container_width=True)
@@ -175,23 +172,24 @@ with mid_2:
     st.plotly_chart(fig_clv, use_container_width=True)
 
 with mid_3:
+    # --- ĐÃ SỬA: MÀU THEO TUYẾN ---
     st.markdown('**Thị phần tương đối (RMS)**')
-    st.caption("RMS > 1 (Màu xanh) là Dẫn đầu. RMS < 1 (Màu đỏ) là Theo sau.")
+    st.caption("Bên phải vạch đỏ là Dẫn đầu thị trường.")
+    
     df_bubble = pd.DataFrame({
         "Tuyến": ["Đông Bắc Á", "Âu Úc Mỹ", "Đông Nam Á", "Nội địa"],
         "RMS Index": [0.8, 1.2, 1.5, 0.9],
         "Tăng trưởng": [15, 10, 5, 8],
         "Doanh thu": [500, 800, 300, 400]
     })
-    # TÍNH TOÁN MÀU DỰA TRÊN VỊ THẾ
-    df_bubble["Vị thế"] = df_bubble["RMS Index"].apply(lambda x: "Dẫn đầu" if x > 1 else "Theo sau")
     
+    # color="Tuyến" ĐỂ MỖI TUYẾN 1 MÀU
     fig_bubble = px.scatter(df_bubble, x="RMS Index", y="Tăng trưởng", size="Doanh thu", 
-                            color="Vị thế", # Màu theo trạng thái thắng/thua
+                            color="Tuyến", # <--- THAY ĐỔI Ở ĐÂY
                             text="Tuyến", size_max=60,
-                            color_discrete_map=COLOR_MAP) # Áp dụng màu chuẩn
+                            color_discrete_map=COLOR_MAP) # Lấy màu từ bảng màu chuẩn
     
-    fig_bubble.add_vline(x=1, line_width=2, line_dash="dash", line_color="gray")
+    fig_bubble.add_vline(x=1, line_width=2, line_dash="dash", line_color="red", annotation_text="Đối thủ = Ta")
     fig_bubble.update_traces(textposition='top center')
     st.plotly_chart(fig_bubble, use_container_width=True)
 
@@ -210,13 +208,12 @@ with mid_5:
         "Chi phí": [2, 5, 1, 3, 0.5],
         "Doanh thu": [20, 60, 15, 10, 2]
     })
-    # TỰ ĐỘNG GÁN MÀU ĐẸP CHO KÊNH
-    fig_mkt = px.scatter(df_mkt, x="Chi phí", y="Doanh thu", color="Kênh", size="Doanh thu", text="Kênh")
+    fig_mkt = px.scatter(df_mkt, x="Chi phí", y="Doanh thu", color="Kênh", size="Doanh thu", text="Kênh", color_discrete_map=COLOR_MAP)
     fig_mkt.update_traces(textposition='top left')
     st.plotly_chart(fig_mkt, use_container_width=True)
 
 # ==============================================================================
-# HÀNG 3: NHÂN SỰ (CONSISTENT COLORS)
+# HÀNG 3: NHÂN SỰ
 # ==============================================================================
 st.markdown('<div class="header-style">4. NHÂN SỰ & QUẢN TRỊ RỦI RO</div>', unsafe_allow_html=True)
 bot_1, bot_2, bot_3 = st.columns(3)
@@ -229,17 +226,15 @@ with bot_1:
         "Lợi nhuận/NS": [180, 200, 220, 200, 230, 250, 150, 170, 190, 160, 180, 200, 120, 130, 140]
     }
     df_hr_bar = pd.DataFrame(data_hr_bar)
-    # ÁP DỤNG COLOR MAP ĐỂ ĐỒNG BỘ MÀU VỚI MỤC DOANH THU
     fig_hr = px.bar(df_hr_bar, x="Năm", y="Lợi nhuận/NS", color="Đơn vị", 
                     barmode='group', text_auto=True, 
-                    color_discrete_map=COLOR_MAP) # <--- MÀU GIỐNG HỆT Ở TRÊN
+                    color_discrete_map=COLOR_MAP)
     fig_hr.update_traces(textposition='outside')
     st.plotly_chart(fig_hr, use_container_width=True)
 
 with bot_2:
     st.markdown('**Giữ chân Key Person**')
     st.metric(label="Tỷ lệ giữ chân", value="95%", delta="-2%")
-    # Bảng cảnh báo có màu sắc
     df_risk = pd.DataFrame({"Khu vực": ["Miền Bắc", "Miền Tây"], "Cảnh báo": ["GĐ Chi nhánh A", "TP Kinh doanh B"], "Rủi ro": ["Cao", "Trung bình"]})
     st.dataframe(df_risk.style.applymap(lambda v: 'color: red; font-weight: bold;' if v == 'Cao' else 'color: black'), use_container_width=True)
 
