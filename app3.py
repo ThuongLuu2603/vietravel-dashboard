@@ -14,13 +14,13 @@ COLOR_MAP = {
     "Inbound": "#17becf", "Outbound": "#0051a3", "Domestic": "#ff7f0e",
     "Đông Bắc Á": "#9467bd", "Âu Úc Mỹ": "#1f77b4", "Đông Nam Á": "#ff7f0e", "Nội địa": "#2ca02c",
     "Facebook": "#4267B2", "Google": "#DB4437", "Tiktok": "#000000", "Event": "#FFC107", "Báo chí": "#757575",
-    "Visa": "#d62728", "Khách quan": "#ff7f0e", "Chủ quan": "#0051a3" # Màu cho Rủi ro
+    "Visa": "#d62728", "Khách quan": "#ff7f0e", "Chủ quan": "#0051a3"
 }
 
 # --- CSS STYLE ---
 st.markdown("""
 <style>
-    .header-style {font-size: 20px; font-weight: bold; margin-top: 15px; margin-bottom: 10px; color: #ffcd00; background-color: #0051a3; padding: 8px 15px; border-radius: 5px;}
+    .header-style {font-size: 22px; font-weight: bold; margin-top: 20px; margin-bottom: 10px; color: #ffcd00; background-color: #0051a3; padding: 8px 15px; border-radius: 5px;}
     .metric-container {background-color: #ffffff; padding: 15px; border-radius: 10px; text-align: center; border: 1px solid #e0e0e0; box-shadow: 0 2px 5px rgba(0,0,0,0.05);}
     .metric-label {font-size: 14px; color: #888; font-weight: 600; text-transform: uppercase;}
     .metric-value {font-size: 36px; font-weight: 800; color: #0051a3;} 
@@ -31,7 +31,7 @@ st.markdown("""
     .nm-val { font-size: 40px; font-weight: 900; color: #0051a3; margin-right: 10px; }
     .nm-delta { font-size: 18px; font-weight: bold; color: #2ca02c; }
     
-    /* CSS CHO CHART TITLE NHỎ GỌN */
+    /* CSS CHO CHART TITLE NHỎ */
     .chart-title {font-size: 14px; font-weight: bold; color: #333; margin-bottom: 5px; text-align: center;}
 </style>
 """, unsafe_allow_html=True)
@@ -51,7 +51,7 @@ top_left, top_right = st.columns([1.8, 1.2])
 with top_left:
     st.markdown('<div class="header-style">1. KINH DOANH: DOANH THU & HIỆU SUẤT</div>', unsafe_allow_html=True)
     
-    # 1.1 KPI (ĐÃ FIX LỖI & CHIỀU CAO 380)
+    # 1.1 KPI (VỊ TRÍ ƯU TIÊN)
     st.markdown('**Tỷ lệ Hoàn thành Kế hoạch (Target = 100%)**')
     entities = ['Toàn Cty', 'HO & ĐNB', 'Miền Bắc', 'Miền Trung', 'Miền Tây']
     act_rev_pct = [0.95, 1.05, 0.90, 0.85, 0.60]
@@ -79,7 +79,7 @@ with top_left:
                           shapes=[dict(type="line", xref="paper", x0=0, x1=1, yref="y", y0=1, y1=1, line=dict(color="red", width=2, dash="dash"))])
     st.plotly_chart(fig_kpi, use_container_width=True)
 
-    # 1.2 Doanh thu (CHIỀU CAO 380)
+    # 1.2 DOANH THU THỰC TẾ
     st.markdown('**Doanh thu & Đóng góp của Hub (Tỷ VNĐ)**')
     months = ['T1', 'T2', 'T3', 'T4', 'T5', 'T6'] 
     data_rev = {
@@ -96,7 +96,7 @@ with top_left:
 with top_right:
     st.markdown('<div class="header-style">2. TÀI CHÍNH</div>', unsafe_allow_html=True)
     
-    # 2.1 NET MARGIN (GOM 1 HÀNG - HEIGHT 100)
+    # 2.1 NET MARGIN (GOM 1 HÀNG)
     st.markdown('<div style="font-size:14px; font-weight:bold; color:#666; margin-bottom:5px;">BIÊN LỢI NHUẬN RÒNG (NET MARGIN)</div>', unsafe_allow_html=True)
     nm_col1, nm_col2 = st.columns([1, 2])
     with nm_col1:
@@ -108,16 +108,16 @@ with top_right:
         fig_spark.update_layout(height=100, margin=dict(l=10, r=10, t=20, b=10), xaxis=dict(showgrid=False, showline=False), yaxis=dict(showgrid=False, visible=False, range=[4, 10]))
         st.plotly_chart(fig_spark, use_container_width=True)
     
-    # 2.2 EBITDA (ĐÃ FIX LỖI CODE & GIẢM HEIGHT CÒN 250)
+    # 2.2 EBITDA (FIX LỖI TEXT_AUTO TUYỆT ĐỐI)
     st.markdown('**EBITDA & Margin**')
     fig_ebitda = go.Figure()
-    # Fix lỗi text_auto bằng cách dùng text list
+    # Dùng text=[...] thay vì text_auto=True
     fig_ebitda.add_trace(go.Bar(name='EBITDA (Tỷ)', x=months, y=[25, 30, 20, 40, 45, 50], marker_color='#2ca02c', text=[25, 30, 20, 40, 45, 50], textposition='auto'))
     fig_ebitda.add_trace(go.Scatter(name='% Margin', x=months, y=[10, 12, 8, 15, 16, 18], yaxis='y2', line=dict(color='#ff7f0e', width=3), mode='lines+markers+text', text=[10, 12, 8, 15, 16, 18], textposition='top center'))
     fig_ebitda.update_layout(yaxis2=dict(overlaying='y', side='right', range=[0, 30]), legend=dict(orientation="h", y=1.1), margin=dict(t=30, b=0), height=250)
     st.plotly_chart(fig_ebitda, use_container_width=True)
 
-    # 2.3 Waterfall (GIẢM HEIGHT CÒN 250)
+    # 2.3 Waterfall
     st.markdown('**Dòng tiền (Cashflow)**')
     fig_waterfall = go.Figure(go.Waterfall(
         name="Cashflow", orientation="v", measure=["relative"]*5+["total"],
@@ -152,6 +152,7 @@ with mid_2:
 with mid_3:
     st.markdown('<div class="chart-title">Tăng trưởng (%)</div>', unsafe_allow_html=True)
     fig_growth = go.Figure()
+    # Fix lỗi text_auto
     fig_growth.add_trace(go.Bar(name='Vietravel', x=['Q1', 'Q2', 'Q3'], y=[15, 20, 25], marker_color='#0051a3', text=[15, 20, 25], textposition='auto'))
     fig_growth.add_trace(go.Scatter(name='Ngành', x=['Q1', 'Q2', 'Q3'], y=[10, 12, 10], mode='lines+markers+text', text=[10, 12, 10], textposition='top center', line=dict(color='red')))
     fig_growth.update_layout(height=250, margin=dict(l=0, r=0, t=10, b=0), showlegend=False)
@@ -175,47 +176,35 @@ with mid_5:
     st.plotly_chart(fig_bubble, use_container_width=True)
 
 # ==============================================================================
-# HÀNG 3: HIỆU QUẢ VẬN HÀNH & CHẤT LƯỢNG (4 BIỂU ĐỒ MỚI BỔ SUNG)
+# HÀNG 3: HIỆU QUẢ VẬN HÀNH & CHẤT LƯỢNG (4 BIỂU ĐỒ BỔ SUNG)
 # ==============================================================================
-st.markdown('<div class="header-style">4. HIỆU QUẢ VẬN HÀNH & CHẤT LƯỢNG (OPERATIONS & QUALITY)</div>', unsafe_allow_html=True)
+st.markdown('<div class="header-style">4. HIỆU QUẢ VẬN HÀNH & CHẤT LƯỢNG</div>', unsafe_allow_html=True)
 op1, op2, op3, op4 = st.columns(4)
 
 with op1:
     st.markdown('<div class="chart-title">1. Chi phí Vận hành/Doanh thu</div>', unsafe_allow_html=True)
-    # Combo: Chi phí (Bar) & Tỷ lệ (Line)
+    # FIX LỖI TEXT_AUTO CHO COMBO CHART
     fig_cost = go.Figure()
-    fig_cost.add_trace(go.Bar(name='Chi phí (Tỷ)', x=['Q1', 'Q2', 'Q3'], y=[40, 45, 50], marker_color='#757575', text_auto=True))
-    fig_cost.add_trace(go.Scatter(name='Tỷ lệ (%)', x=['Q1', 'Q2', 'Q3'], y=[10, 11, 12], yaxis='y2', line=dict(color='red', width=3)))
+    fig_cost.add_trace(go.Bar(name='Chi phí (Tỷ)', x=['Q1', 'Q2', 'Q3'], y=[40, 45, 50], marker_color='#757575', text=[40, 45, 50], textposition='auto'))
+    fig_cost.add_trace(go.Scatter(name='Tỷ lệ (%)', x=['Q1', 'Q2', 'Q3'], y=[10, 11, 12], yaxis='y2', line=dict(color='red', width=3), mode='lines+markers+text', text=[10, 11, 12], textposition='top center'))
     fig_cost.update_layout(yaxis2=dict(overlaying='y', side='right'), legend=dict(orientation="h", y=-0.2), height=250, margin=dict(l=0, r=0, t=10, b=0))
     st.plotly_chart(fig_cost, use_container_width=True)
 
 with op2:
     st.markdown('<div class="chart-title">2. Rủi ro: Lý do Hủy Tour</div>', unsafe_allow_html=True)
-    # Stacked Bar Rủi ro
-    df_risk_ops = pd.DataFrame({
-        "Tháng": ["T10", "T10", "T10", "T11", "T11", "T11"],
-        "Lý do": ["Visa", "Khách quan", "Chủ quan"]*2,
-        "Số lượng": [20, 10, 5, 25, 15, 8]
-    })
+    df_risk_ops = pd.DataFrame({"Tháng": ["T10", "T10", "T10", "T11", "T11", "T11"], "Lý do": ["Visa", "Khách quan", "Chủ quan"]*2, "Số lượng": [20, 10, 5, 25, 15, 8]})
     fig_risk = px.bar(df_risk_ops, x="Tháng", y="Số lượng", color="Lý do", text_auto=True, color_discrete_map=COLOR_MAP)
     fig_risk.update_layout(height=250, margin=dict(l=0, r=0, t=10, b=0), legend=dict(orientation="h", y=-0.2))
     st.plotly_chart(fig_risk, use_container_width=True)
 
 with op3:
     st.markdown('<div class="chart-title">3. Hài lòng (NPS)</div>', unsafe_allow_html=True)
-    # Gauge Chart
-    fig_nps = go.Figure(go.Indicator(
-        mode = "gauge+number+delta", value = 65,
-        delta = {'reference': 50, 'increasing': {'color': "#2ca02c"}},
-        gauge = {'axis': {'range': [-100, 100]}, 'bar': {'color': "#0051a3"},
-                 'steps': [{'range': [-100, 0], 'color': "#f4cccc"}, {'range': [0, 50], 'color': "#fff2cc"}, {'range': [50, 100], 'color': "#d9ead3"}]}
-    ))
+    fig_nps = go.Figure(go.Indicator(mode = "gauge+number+delta", value = 65, delta = {'reference': 50, 'increasing': {'color': "#2ca02c"}}, gauge = {'axis': {'range': [-100, 100]}, 'bar': {'color': "#0051a3"}, 'steps': [{'range': [-100, 0], 'color': "#f4cccc"}, {'range': [0, 50], 'color': "#fff2cc"}, {'range': [50, 100], 'color': "#d9ead3"}]}))
     fig_nps.update_layout(height=250, margin=dict(l=20, r=20, t=10, b=0))
     st.plotly_chart(fig_nps, use_container_width=True)
 
 with op4:
     st.markdown('<div class="chart-title">4. Đổi mới (Sản phẩm mới)</div>', unsafe_allow_html=True)
-    # Donut Chart
     fig_inn = go.Figure(data=[go.Pie(labels=['Cũ', 'Mới'], values=[90, 10], hole=.6, marker_colors=['#e0e0e0', '#2ca02c'])])
     fig_inn.update_layout(annotations=[dict(text='10%', x=0.5, y=0.5, font_size=20, showarrow=False)], showlegend=True, height=250, margin=dict(l=0, r=0, t=10, b=0), legend=dict(orientation="h", y=-0.2))
     st.plotly_chart(fig_inn, use_container_width=True)
