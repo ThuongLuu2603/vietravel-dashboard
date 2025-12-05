@@ -113,15 +113,16 @@ with top_right:
     fig_ebitda.update_layout(yaxis2=dict(overlaying='y', side='right', range=[0, 30]), legend=dict(orientation="h", y=1.1), margin=dict(t=30, b=0), height=250)
     st.plotly_chart(fig_ebitda, use_container_width=True)
 
-    # 2.3 Waterfall (GIẢM HEIGHT CÒN 250)
+    # 2.3 Waterfall
     st.markdown('**Dòng tiền (Cashflow)**')
     fig_waterfall = go.Figure(go.Waterfall(
-        name="Cashflow", orientation="v", measure=["relative"]*5+["total"],
+        name="Cashflow", orientation="v",
+        measure=["relative", "relative", "total", "relative", "relative", "total"],
         x=["Đầu kỳ", "Thu Tour", "Tiền mặt", "Trả NCC", "Chi phí", "Cuối kỳ"],
         y=[200, 800, 0, -400, -250, 0], text=[200, 800, 1000, -400, -250, 350],
         textposition="outside", connector={"line": {"color": "rgb(63, 63, 63)"}}
     ))
-    fig_waterfall.update_layout(margin=dict(t=30, b=0), height=250)
+    fig_waterfall.update_layout(margin=dict(t=20, b=20),, height=250)
     st.plotly_chart(fig_waterfall, use_container_width=True)
 
 # ==============================================================================
