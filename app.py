@@ -40,7 +40,7 @@ filter_period = st.sidebar.selectbox("Giai đoạn:", ["Tháng 11/2025", "Quý 4
 c_logo_top, c_title_top = st.columns([1, 5])
 with c_logo_top:
     # Nếu muốn logo hiện cả ở đây thì uncomment dòng dưới
-    st.image("https://www.vietravel.com/Content/img/logo_en.png", width=150)
+    st.image("https://www.vietravel.com/Content/img/logo_en.png", width=250)
     pass
 with c_title_top:
     st.title(f"DASHBOARD CHIẾN LƯỢC VIETRAVEL - {filter_period}")
