@@ -104,16 +104,16 @@ with top_right:
         fig_spark.update_layout(height=100, margin=dict(l=10, r=10, t=20, b=10), xaxis=dict(showgrid=False, showline=False), yaxis=dict(showgrid=False, visible=False, range=[4, 10]))
         st.plotly_chart(fig_spark, use_container_width=True)
     
-    # 2.2 EBITDA (SỬA LỖI TEXT_AUTO & GIẢM HEIGHT CÒN 230)
+    # 2.2 EBITDA (SỬA LỖI TEXT_AUTO & GIẢM HEIGHT CÒN 250)
     st.markdown('**EBITDA & Margin**')
     fig_ebitda = go.Figure()
     # Fix lỗi: text=[...]
     fig_ebitda.add_trace(go.Bar(name='EBITDA (Tỷ)', x=months, y=[25, 30, 20, 40, 45, 50], marker_color='#2ca02c', text=[25, 30, 20, 40, 45, 50], textposition='auto'))
     fig_ebitda.add_trace(go.Scatter(name='% Margin', x=months, y=[10, 12, 8, 15, 16, 18], yaxis='y2', line=dict(color='#ff7f0e', width=3), mode='lines+markers+text', text=[10, 12, 8, 15, 16, 18], textposition='top center'))
-    fig_ebitda.update_layout(yaxis2=dict(overlaying='y', side='right', range=[0, 30]), legend=dict(orientation="h", y=1.1), margin=dict(t=30, b=0), height=250)
+    fig_ebitda.update_layout(yaxis2=dict(overlaying='y', side='right', range=[0, 30]), legend=dict(orientation="h", y=1.1), margin=dict(t=20, b=0), height=250)
     st.plotly_chart(fig_ebitda, use_container_width=True)
 
-    # 2.3 Waterfall (GIẢM HEIGHT CÒN 230)
+    # 2.3 Waterfall (GIẢM HEIGHT CÒN 250)
     st.markdown('**Dòng tiền (Cashflow)**')
     fig_waterfall = go.Figure(go.Waterfall(
         name="Cashflow", orientation="v", measure=["relative"]*5+["total"],
@@ -121,7 +121,7 @@ with top_right:
         y=[200, 800, 0, -400, -250, 0], text=[200, 800, 1000, -400, -250, 350],
         textposition="outside", connector={"line": {"color": "rgb(63, 63, 63)"}}
     ))
-    fig_waterfall.update_layout(margin=dict(t=20, b=20), height=250)
+    fig_waterfall.update_layout(margin=dict(t=20, b=0), height=250)
     st.plotly_chart(fig_waterfall, use_container_width=True)
 
 # ==============================================================================
