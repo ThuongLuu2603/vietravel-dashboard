@@ -7,13 +7,17 @@ import numpy as np
 # --- CẤU HÌNH TRANG ---
 st.set_page_config(layout="wide", page_title="Vietravel Strategic Dashboard")
 
-# CSS Style Vietravel
+# CSS Style Vietravel - ĐÃ SỬA CSS CHO BIG NUMBER
 st.markdown("""
 <style>
     .header-style {font-size: 22px; font-weight: bold; margin-top: 20px; margin-bottom: 10px; color: #ffcd00; background-color: #0051a3; padding: 8px 15px; border-radius: 5px;}
     .sub-header {font-size: 18px; font-weight: bold; color: #0051a3; border-bottom: 2px solid #ffcd00; margin-bottom: 10px;}
-    .big-number {font-size: 36px; font-weight: bold; color: #2ca02c;}
-    .metric-label {font-size: 16px; color: #555;}
+    .metric-container {background-color: #f8f9fa; padding: 15px; border-radius: 10px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1);}
+    .metric-label {font-size: 16px; color: #666; font-weight: 500; margin-bottom: 5px;}
+    /* SỐ CHÍNH TO (HERO NUMBER) */
+    .metric-value {font-size: 42px; font-weight: 900; color: #0051a3; line-height: 1.2;} 
+    /* SỐ PHỤ NHỎ (CONTEXT NUMBER) */
+    .metric-delta {font-size: 18px; font-weight: bold; color: #2ca02c; vertical-align: middle; margin-left: 10px;}
 </style>
 """, unsafe_allow_html=True)
 
@@ -46,7 +50,7 @@ with top_left:
     }
     df_rev = pd.DataFrame(data_rev)
     fig_rev = px.bar(df_rev, x="Tháng", y="Doanh Thu", color="Hub", 
-                     title="Doanh thu thực tế (Hiển thị số liệu)", text_auto=True,
+                     title="Doanh thu thực tế (Standard Stacked Bar)", text_auto=True,
                      color_discrete_sequence=['#0051a3', '#d62728', '#ffcd00', '#2ca02c'])
     fig_rev.update_traces(textposition='inside') 
     st.plotly_chart(fig_rev, use_container_width=True)
@@ -86,37 +90,29 @@ with top_left:
 with top_right:
     st.markdown('<div class="header-style">2. TÀI CHÍNH: LỢI NHUẬN & DÒNG TIỀN</div>', unsafe_allow_html=True)
     
-    # --- 2.2 SỬA LẠI SPARKLINE (CÓ CHỮ, CÓ SỐ) ---
+    # --- 2.2 SỬA LẠI CSS CHO SỐ TO/SỐ NHỎ ---
     st.markdown("""
-        <div style="background-color: #f0f2f6; padding: 10px; border-radius: 10px; text-align: center;">
-            <p class="metric-label">Biên Lợi Nhuận Ròng (Net Margin)</p>
-            <p class="big-number">8.5% <span style="font-size: 20px; color: green;">▲ 0.5%</span></p>
+        <div class="metric-container">
+            <div class="metric-label">Biên Lợi Nhuận Ròng (Net Margin)</div>
+            <div>
+                <span class="metric-value">8.5%</span> 
+                <span class="metric-delta">▲ 0.5%</span>
+            </div>
         </div>
     """, unsafe_allow_html=True)
     
-    # Dữ liệu Sparkline
+    # Sparkline
     spark_months = ['T6', 'T7', 'T8', 'T9', 'T10', 'T11']
     spark_values = [5.0, 6.0, 5.5, 7.0, 8.0, 8.5]
-    
     fig_spark = go.Figure()
     fig_spark.add_trace(go.Scatter(
-        x=spark_months, 
-        y=spark_values,
-        mode='lines+markers+text', # Hiện cả đường, điểm và chữ
-        text=[f"{v}%" for v in spark_values], # Format số %
-        textposition="top center", # Vị trí chữ nằm trên điểm
-        line=dict(color='#2ca02c', width=3), # Màu xanh lá
-        marker=dict(size=8, color='white', line=dict(width=2, color='#2ca02c')) # Điểm tròn trắng viền xanh
+        x=spark_months, y=spark_values, mode='lines+markers+text',
+        text=[f"{v}%" for v in spark_values], textposition="top center",
+        line=dict(color='#2ca02c', width=3), marker=dict(size=8, color='white', line=dict(width=2, color='#2ca02c'))
     ))
-    
-    # Cấu hình lại trục để hiện Tháng nhưng ẩn lưới Y cho gọn
-    fig_spark.update_layout(
-        title="Xu hướng 6 tháng gần nhất",
-        height=180, # Tăng chiều cao để không bị mất chữ
-        margin=dict(l=10, r=10, t=30, b=10),
-        xaxis=dict(showgrid=False, showline=False), # Hiện trục hoành
-        yaxis=dict(showgrid=False, visible=False, range=[4, 10]) # Ẩn trục tung, nới range để chữ ko bị cắt
-    )
+    fig_spark.update_layout(height=180, margin=dict(l=10, r=10, t=30, b=10),
+                            title="Xu hướng 6 tháng", xaxis=dict(showgrid=False, showline=False),
+                            yaxis=dict(showgrid=False, visible=False, range=[4, 10]))
     st.plotly_chart(fig_spark, use_container_width=True)
     
     # 2.1 EBITDA
@@ -135,10 +131,8 @@ with top_right:
         name="Cashflow", orientation="v",
         measure=["relative", "relative", "total", "relative", "relative", "total"],
         x=["Đầu kỳ", "Thu Tour", "Tiền mặt", "Trả NCC", "Chi phí", "Cuối kỳ"],
-        y=[200, 800, 0, -400, -250, 0],
-        text=[200, 800, 1000, -400, -250, 350],
-        textposition="outside",
-        connector={"line": {"color": "rgb(63, 63, 63)"}}
+        y=[200, 800, 0, -400, -250, 0], text=[200, 800, 1000, -400, -250, 350],
+        textposition="outside", connector={"line": {"color": "rgb(63, 63, 63)"}}
     ))
     st.plotly_chart(fig_waterfall, use_container_width=True)
 
@@ -168,15 +162,24 @@ with mid_2:
     st.plotly_chart(fig_clv, use_container_width=True)
 
 with mid_3:
-    st.markdown('**Thị phần tương đối (%)**')
+    # --- 3.3 THỊ PHẦN TƯƠNG ĐỐI (Đã thêm giải thích cách tính) ---
+    st.markdown('**Thị phần tương đối (Relative Market Share)**')
+    st.caption("Công thức: (Thị phần Vietravel) / (Thị phần Đối thủ lớn nhất). >1 là Dẫn đầu.")
+    
+    # Dữ liệu mẫu (Giả định Vietravel đang dẫn đầu ở ĐNA với chỉ số 1.5)
     df_bubble = pd.DataFrame({
         "Tuyến": ["Đông Bắc Á", "Âu Úc Mỹ", "Đông Nam Á", "Nội địa"],
-        "Thị phần": [35, 20, 40, 25],
+        "RMS Index": [0.8, 1.2, 1.5, 0.9], # <1 là thua, >1 là thắng
         "Tăng trưởng": [15, 10, 5, 8],
         "Doanh thu": [500, 800, 300, 400]
     })
-    fig_bubble = px.scatter(df_bubble, x="Thị phần", y="Tăng trưởng", size="Doanh thu", color="Tuyến",
-                            text="Tuyến", size_max=60)
+    
+    fig_bubble = px.scatter(df_bubble, x="RMS Index", y="Tăng trưởng", size="Doanh thu", color="Tuyến",
+                            text="Tuyến", size_max=60,
+                            labels={"RMS Index": "Chỉ số Thị phần Tương đối (RMS)"})
+    
+    # Vẽ đường tham chiếu RMS = 1 (Điểm cân bằng)
+    fig_bubble.add_vline(x=1, line_width=2, line_dash="dash", line_color="red", annotation_text="Đối thủ = Ta")
     fig_bubble.update_traces(textposition='top center')
     st.plotly_chart(fig_bubble, use_container_width=True)
 
@@ -207,32 +210,24 @@ bot_1, bot_2, bot_3 = st.columns(3)
 
 with bot_1:
     st.markdown('**Năng suất: Lợi nhuận/Người (Triệu VNĐ)**')
-    
     data_hr_bar = {
         "Năm": ["2023", "2024", "2025"] * 5,
         "Đơn vị": sorted(["Toàn Cty", "HO & ĐNB", "Miền Bắc", "Miền Trung", "Miền Tây"] * 3),
         "Lợi nhuận/NS": [180, 200, 220, 200, 230, 250, 150, 170, 190, 160, 180, 200, 120, 130, 140]
     }
     df_hr_bar = pd.DataFrame(data_hr_bar)
-    
     fig_hr = px.bar(df_hr_bar, x="Năm", y="Lợi nhuận/NS", color="Đơn vị", 
-                    barmode='group', text_auto=True, 
-                    title="So sánh năng suất nhân sự qua các năm")
+                    barmode='group', text_auto=True, title="So sánh năng suất nhân sự")
     fig_hr.update_traces(textposition='outside')
     st.plotly_chart(fig_hr, use_container_width=True)
 
 with bot_2:
     st.markdown('**Giữ chân Key Person**')
     st.metric(label="Tỷ lệ giữ chân", value="95%", delta="-2%")
-    st.table(pd.DataFrame({
-        "Khu vực": ["Miền Bắc", "Miền Tây"],
-        "Cảnh báo": ["GĐ Chi nhánh A", "TP Kinh doanh B"],
-        "Rủi ro": ["Cao", "Trung bình"]
-    }))
+    st.table(pd.DataFrame({"Khu vực": ["Miền Bắc", "Miền Tây"], "Cảnh báo": ["GĐ Chi nhánh A", "TP Kinh doanh B"], "Rủi ro": ["Cao", "Trung bình"]}))
 
 with bot_3:
     st.markdown('**Sẵn sàng kế thừa (%)**')
     z_data = [[100, 90, 20], [80, 50, 10], [100, 100, 80]]
-    fig_heat = px.imshow(z_data, x=['TP', 'PGĐ', 'GĐ'], y=['Miền Tây', 'Miền Bắc', 'HO'],
-                         color_continuous_scale='RdYlGn', text_auto=True) 
+    fig_heat = px.imshow(z_data, x=['TP', 'PGĐ', 'GĐ'], y=['Miền Tây', 'Miền Bắc', 'HO'], color_continuous_scale='RdYlGn', text_auto=True) 
     st.plotly_chart(fig_heat, use_container_width=True)
