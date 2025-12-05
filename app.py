@@ -163,42 +163,24 @@ with mid_2:
 
 with mid_3:
     # --- 3.3 THỊ PHẦN TƯƠNG ĐỐI (Đã thêm giải thích cách tính) ---
-    st.markdown('**Thị phần tương đối (RMS)**')
-    st.caption("RMS = Doanh thu Vietravel / Doanh thu Đối thủ lớn nhất")
-
-    # 1. NHẬP LIỆU (Trong thực tế sẽ lấy từ Database)
-    # Giả lập dữ liệu tại 4 thị trường chính
-    data_rms = {
-        "Thị trường": ["Đông Bắc Á", "Âu-Úc-Mỹ", "Đông Nam Á", "Nội địa"],
-        "Rev_Vietravel": [500, 800, 300, 400],       # Doanh thu mình
-        "Rev_Competitor": [400, 900, 200, 450],      # Doanh thu đối thủ (Ước tính)
-        "Tăng trưởng": [15, 10, 5, 8]                # Tăng trưởng của mình
-    }
-    df_rms = pd.DataFrame(data_rms)
-
-    # 2. TÍNH TOÁN RMS TỰ ĐỘNG
-    df_rms["RMS Index"] = df_rms["Rev_Vietravel"] / df_rms["Rev_Competitor"]
+    st.markdown('**Thị phần tương đối (Relative Market Share)**')
+    st.caption("Công thức: (Thị phần Vietravel) / (Thị phần Đối thủ lớn nhất). >1 là Dẫn đầu.")
     
-    # Phân loại trạng thái
-    df_rms["Vị thế"] = df_rms["RMS Index"].apply(lambda x: "Dẫn đầu" if x > 1 else "Theo sau")
-
-    # 3. VẼ BIEU ĐỒ BUBBLE CHART
-    # Trục X: RMS Index (Càng về bên phải càng mạnh)
-    # Trục Y: Tăng trưởng
-    # Kích thước: Quy mô doanh thu của mình
-    fig_bubble = px.scatter(df_rms, x="RMS Index", y="Tăng trưởng", 
-                            size="Rev_Vietravel", color="Vị thế",
-                            text="Thị trường", size_max=60,
-                            color_discrete_map={"Dẫn đầu": "#2ca02c", "Theo sau": "#d62728"},
-                            title="Vị thế cạnh tranh (RMS > 1 là Tốt)")
+    # Dữ liệu mẫu (Giả định Vietravel đang dẫn đầu ở ĐNA với chỉ số 1.5)
+    df_bubble = pd.DataFrame({
+        "Tuyến": ["Đông Bắc Á", "Âu Úc Mỹ", "Đông Nam Á", "Nội địa"],
+        "RMS Index": [0.8, 1.2, 1.5, 0.9], # <1 là thua, >1 là thắng
+        "Tăng trưởng": [15, 10, 5, 8],
+        "Doanh thu": [500, 800, 300, 400]
+    })
+    
+    fig_bubble = px.scatter(df_bubble, x="RMS Index", y="Tăng trưởng", size="Doanh thu", color="Tuyến",
+                            text="Tuyến", size_max=60,
+                            labels={"RMS Index": "Chỉ số Thị phần Tương đối (RMS)"})
     
     # Vẽ đường tham chiếu RMS = 1 (Điểm cân bằng)
-    fig_bubble.add_vline(x=1, line_width=2, line_dash="dash", line_color="gray", annotation_text="Đối thủ = Ta")
-    
-    # Tinh chỉnh hiển thị
+    fig_bubble.add_vline(x=1, line_width=2, line_dash="dash", line_color="red", annotation_text="Đối thủ = Ta")
     fig_bubble.update_traces(textposition='top center')
-    fig_bubble.update_layout(xaxis_title="Chỉ số Thị phần Tương đối (RMS)", yaxis_title="Tăng trưởng (%)")
-    
     st.plotly_chart(fig_bubble, use_container_width=True)
 
 mid_4, mid_5 = st.columns(2)
