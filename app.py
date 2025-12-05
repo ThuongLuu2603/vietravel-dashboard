@@ -7,21 +7,16 @@ import numpy as np
 # --- CẤU HÌNH TRANG ---
 st.set_page_config(layout="wide", page_title="Vietravel Strategic Dashboard")
 
-# --- ĐỊNH NGHĨA BẢNG MÀU CHIẾN LƯỢC (ĐÃ THÊM MÀU CHO TUYẾN) ---
+# --- BẢNG MÀU CHIẾN LƯỢC ---
 COLOR_MAP = {
-    # Hubs
     "Toàn Cty": "#333333",
-    "HO & ĐNB": "#0051a3",    # Xanh Vietravel
-    "Miền Bắc": "#d62728",    # Đỏ
-    "Miền Trung": "#ffcd00",  # Vàng
-    "Miền Tây": "#2ca02c",    # Xanh lá
-    # Các mảng kinh doanh
+    "HO & ĐNB": "#0051a3",    
+    "Miền Bắc": "#d62728",    
+    "Miền Trung": "#ffcd00",  
+    "Miền Tây": "#2ca02c",    
     "Inbound": "#17becf", "Outbound": "#0051a3", "Domestic": "#ff7f0e",
-    # MÀU CHO CÁC TUYẾN (CẬP NHẬT MỚI)
-    "Đông Bắc Á": "#9467bd",  # Tím (Trendy)
-    "Âu Úc Mỹ": "#1f77b4",    # Xanh dương (Sang trọng)
-    "Đông Nam Á": "#ff7f0e",  # Cam (Năng động)
-    "Nội địa": "#2ca02c",     # Xanh lá (Việt Nam)
+    # MÀU TUYẾN
+    "Đông Bắc Á": "#9467bd", "Âu Úc Mỹ": "#1f77b4", "Đông Nam Á": "#ff7f0e", "Nội địa": "#2ca02c",
     # Kênh Marketing
     "Facebook": "#4267B2", "Google": "#DB4437", "Tiktok": "#000000", "Event": "#FFC107", "Báo chí": "#757575"
 }
@@ -99,7 +94,7 @@ with top_left:
 with top_right:
     st.markdown('<div class="header-style">2. TÀI CHÍNH</div>', unsafe_allow_html=True)
     
-    # 2.2 Sparkline
+    # 2.2 Sparkline (CSS Số To Số Nhỏ)
     st.markdown("""
         <div class="metric-container">
             <div class="metric-label">Biên Lợi Nhuận Ròng</div>
@@ -146,7 +141,7 @@ with top_right:
     st.plotly_chart(fig_waterfall, use_container_width=True)
 
 # ==============================================================================
-# HÀNG 2: THỊ TRƯỜNG & KHÁCH HÀNG (ĐÃ SỬA BUBBLE CHART THEO YÊU CẦU)
+# HÀNG 2: THỊ TRƯỜNG & KHÁCH HÀNG (ĐÃ SWAP VỊ TRÍ)
 # ==============================================================================
 st.markdown('<div class="header-style">3. THỊ TRƯỜNG & KHÁCH HÀNG</div>', unsafe_allow_html=True)
 mid_1, mid_2, mid_3 = st.columns(3)
@@ -172,36 +167,7 @@ with mid_2:
     st.plotly_chart(fig_clv, use_container_width=True)
 
 with mid_3:
-    # --- ĐÃ SỬA: MÀU THEO TUYẾN ---
-    st.markdown('**Thị phần tương đối (RMS)**')
-    st.caption("Bên phải vạch đỏ là Dẫn đầu thị trường.")
-    
-    df_bubble = pd.DataFrame({
-        "Tuyến": ["Đông Bắc Á", "Âu Úc Mỹ", "Đông Nam Á", "Nội địa"],
-        "RMS Index": [0.8, 1.2, 1.5, 0.9],
-        "Tăng trưởng": [15, 10, 5, 8],
-        "Doanh thu": [500, 800, 300, 400]
-    })
-    
-    # color="Tuyến" ĐỂ MỖI TUYẾN 1 MÀU
-    fig_bubble = px.scatter(df_bubble, x="RMS Index", y="Tăng trưởng", size="Doanh thu", 
-                            color="Tuyến", # <--- THAY ĐỔI Ở ĐÂY
-                            text="Tuyến", size_max=60,
-                            color_discrete_map=COLOR_MAP) # Lấy màu từ bảng màu chuẩn
-    
-    fig_bubble.add_vline(x=1, line_width=2, line_dash="dash", line_color="red", annotation_text="Đối thủ = Ta")
-    fig_bubble.update_traces(textposition='top center')
-    st.plotly_chart(fig_bubble, use_container_width=True)
-
-mid_4, mid_5 = st.columns(2)
-with mid_4:
-    st.markdown('**Tăng trưởng (%)**')
-    fig_growth = go.Figure()
-    fig_growth.add_trace(go.Bar(name='Vietravel', x=['Q1', 'Q2', 'Q3'], y=[15, 20, 25], marker_color='#0051a3', text=[15, 20, 25], textposition='auto'))
-    fig_growth.add_trace(go.Scatter(name='Ngành', x=['Q1', 'Q2', 'Q3'], y=[10, 12, 10], mode='lines+markers+text', text=[10, 12, 10], textposition='top center', line=dict(color='red')))
-    st.plotly_chart(fig_growth, use_container_width=True)
-
-with mid_5:
+    # --- VỊ TRÍ MỚI CỦA ROI MARKETING (ĐƯA LÊN TRÊN) ---
     st.markdown('**ROI Marketing (Tỷ VNĐ)**')
     df_mkt = pd.DataFrame({
         "Kênh": ["Facebook", "Google", "Tiktok", "Event", "Báo chí"],
@@ -211,6 +177,42 @@ with mid_5:
     fig_mkt = px.scatter(df_mkt, x="Chi phí", y="Doanh thu", color="Kênh", size="Doanh thu", text="Kênh", color_discrete_map=COLOR_MAP)
     fig_mkt.update_traces(textposition='top left')
     st.plotly_chart(fig_mkt, use_container_width=True)
+
+# HÀNG 2.5: CÁC BIỂU ĐỒ LỚN (CHIỀU RỘNG 50%)
+mid_4, mid_5 = st.columns(2)
+
+with mid_4:
+    st.markdown('**Tăng trưởng (%)**')
+    fig_growth = go.Figure()
+    fig_growth.add_trace(go.Bar(name='Vietravel', x=['Q1', 'Q2', 'Q3'], y=[15, 20, 25], marker_color='#0051a3', text=[15, 20, 25], textposition='auto'))
+    fig_growth.add_trace(go.Scatter(name='Ngành', x=['Q1', 'Q2', 'Q3'], y=[10, 12, 10], mode='lines+markers+text', text=[10, 12, 10], textposition='top center', line=dict(color='red')))
+    st.plotly_chart(fig_growth, use_container_width=True)
+
+with mid_5:
+    # --- VỊ TRÍ MỚI CỦA THỊ PHẦN RMS (ĐƯA XUỐNG DƯỚI ĐỂ RỘNG HƠN) ---
+    st.markdown('**Thị phần tương đối (Theo Lượt Khách)**')
+    st.caption("RMS = Khách Vietravel / Khách Đối thủ. Bóng to = Đông khách.")
+    
+    # DỮ LIỆU ĐÃ ĐỔI: DOANH THU -> LƯỢT KHÁCH
+    df_bubble = pd.DataFrame({
+        "Tuyến": ["Đông Bắc Á", "Âu Úc Mỹ", "Đông Nam Á", "Nội địa"],
+        "RMS Index": [0.8, 1.2, 1.5, 0.9],
+        "Tăng trưởng": [15, 10, 5, 8],
+        "Lượt khách": [15000, 8000, 25000, 40000] # <--- DỮ LIỆU MỚI (PAX)
+    })
+    
+    df_bubble["Vị thế"] = df_bubble["RMS Index"].apply(lambda x: "Dẫn đầu" if x > 1 else "Theo sau")
+    
+    # size="Lượt khách" -> Bóng to thể hiện đông khách
+    fig_bubble = px.scatter(df_bubble, x="RMS Index", y="Tăng trưởng", 
+                            size="Lượt khách", # Kích thước bóng theo PAX
+                            color="Tuyến", 
+                            text="Tuyến", size_max=60,
+                            color_discrete_map=COLOR_MAP) 
+    
+    fig_bubble.add_vline(x=1, line_width=2, line_dash="dash", line_color="red", annotation_text="Đối thủ = Ta")
+    fig_bubble.update_traces(textposition='top center')
+    st.plotly_chart(fig_bubble, use_container_width=True)
 
 # ==============================================================================
 # HÀNG 3: NHÂN SỰ
