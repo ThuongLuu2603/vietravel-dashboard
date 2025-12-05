@@ -51,7 +51,7 @@ top_left, top_right = st.columns([1.8, 1.2])
 with top_left:
     st.markdown('<div class="header-style">1. KINH DOANH: DOANH THU & HIỆU SUẤT</div>', unsafe_allow_html=True)
     
-    # 1.1 KPI
+    # 1.1 KPI (ĐÃ FIX LỖI & CHIỀU CAO 380)
     st.markdown('**Tỷ lệ Hoàn thành Kế hoạch (Target = 100%)**')
     entities = ['Toàn Cty', 'HO & ĐNB', 'Miền Bắc', 'Miền Trung', 'Miền Tây']
     act_rev_pct = [0.95, 1.05, 0.90, 0.85, 0.60]
@@ -75,11 +75,11 @@ with top_left:
     add_kpi_group("Lượt khách", act_pax_pct, '#ff7f0e', '#ffbb78', 1)
     add_kpi_group("Lãi gộp", act_gp_pct, '#d62728', '#f4cccc', 2)
 
-    fig_kpi.update_layout(barmode='group', yaxis_tickformat='.0%', height=350, margin=dict(t=20, b=20),
+    fig_kpi.update_layout(barmode='group', yaxis_tickformat='.0%', height=380, margin=dict(t=20, b=20),
                           shapes=[dict(type="line", xref="paper", x0=0, x1=1, yref="y", y0=1, y1=1, line=dict(color="red", width=2, dash="dash"))])
     st.plotly_chart(fig_kpi, use_container_width=True)
 
-    # 1.2 Doanh thu
+    # 1.2 Doanh thu (CHIỀU CAO 380)
     st.markdown('**Doanh thu & Đóng góp của Hub (Tỷ VNĐ)**')
     months = ['T1', 'T2', 'T3', 'T4', 'T5', 'T6'] 
     data_rev = {
@@ -90,13 +90,13 @@ with top_left:
     df_rev = pd.DataFrame(data_rev)
     fig_rev = px.bar(df_rev, x="Tháng", y="Doanh Thu", color="Hub", title="", text_auto=True, color_discrete_map=COLOR_MAP)
     fig_rev.update_traces(textposition='inside', textfont_color='white')
-    fig_rev.update_layout(height=350, margin=dict(t=20, b=20))
+    fig_rev.update_layout(height=380, margin=dict(t=20, b=20))
     st.plotly_chart(fig_rev, use_container_width=True)
 
 with top_right:
     st.markdown('<div class="header-style">2. TÀI CHÍNH</div>', unsafe_allow_html=True)
     
-    # 2.1 NET MARGIN
+    # 2.1 NET MARGIN (GOM 1 HÀNG - HEIGHT 100)
     st.markdown('<div style="font-size:14px; font-weight:bold; color:#666; margin-bottom:5px;">BIÊN LỢI NHUẬN RÒNG (NET MARGIN)</div>', unsafe_allow_html=True)
     nm_col1, nm_col2 = st.columns([1, 2])
     with nm_col1:
@@ -108,15 +108,16 @@ with top_right:
         fig_spark.update_layout(height=100, margin=dict(l=10, r=10, t=20, b=10), xaxis=dict(showgrid=False, showline=False), yaxis=dict(showgrid=False, visible=False, range=[4, 10]))
         st.plotly_chart(fig_spark, use_container_width=True)
     
-    # 2.2 EBITDA
+    # 2.2 EBITDA (ĐÃ FIX LỖI CODE & GIẢM HEIGHT CÒN 250)
     st.markdown('**EBITDA & Margin**')
     fig_ebitda = go.Figure()
+    # Fix lỗi text_auto bằng cách dùng text list
     fig_ebitda.add_trace(go.Bar(name='EBITDA (Tỷ)', x=months, y=[25, 30, 20, 40, 45, 50], marker_color='#2ca02c', text=[25, 30, 20, 40, 45, 50], textposition='auto'))
     fig_ebitda.add_trace(go.Scatter(name='% Margin', x=months, y=[10, 12, 8, 15, 16, 18], yaxis='y2', line=dict(color='#ff7f0e', width=3), mode='lines+markers+text', text=[10, 12, 8, 15, 16, 18], textposition='top center'))
     fig_ebitda.update_layout(yaxis2=dict(overlaying='y', side='right', range=[0, 30]), legend=dict(orientation="h", y=1.1), margin=dict(t=30, b=0), height=250)
     st.plotly_chart(fig_ebitda, use_container_width=True)
 
-    # 2.3 Waterfall
+    # 2.3 Waterfall (GIẢM HEIGHT CÒN 250)
     st.markdown('**Dòng tiền (Cashflow)**')
     fig_waterfall = go.Figure(go.Waterfall(
         name="Cashflow", orientation="v", measure=["relative"]*5+["total"],
@@ -128,51 +129,49 @@ with top_right:
     st.plotly_chart(fig_waterfall, use_container_width=True)
 
 # ==============================================================================
-# HÀNG 2: THỊ TRƯỜNG & KHÁCH HÀNG
+# HÀNG 2: THỊ TRƯỜNG & KHÁCH HÀNG (5 CỘT)
 # ==============================================================================
 st.markdown('<div class="header-style">3. THỊ TRƯỜNG & KHÁCH HÀNG</div>', unsafe_allow_html=True)
-mid_1, mid_2, mid_3 = st.columns(3)
+mid_1, mid_2, mid_3, mid_4, mid_5 = st.columns(5)
 
 with mid_1:
-    st.markdown('**Cấu trúc Doanh thu**')
-    df_market = pd.DataFrame({"Năm": ["2023", "2023", "2023", "2024", "2024", "2024", "2025", "2025", "2025"], "Mảng": ["Inbound", "Outbound", "Domestic"] * 3, "Doanh Thu": [200, 500, 300, 250, 600, 350, 400, 800, 500]})
+    st.markdown('<div class="chart-title">Cấu trúc Doanh thu</div>', unsafe_allow_html=True)
+    df_market = pd.DataFrame({"Năm": ["23", "23", "23", "24", "24", "24", "25", "25", "25"], "Mảng": ["In", "Out", "Dom"] * 3, "Doanh Thu": [200, 500, 300, 250, 600, 350, 400, 800, 500]})
     fig_market = px.bar(df_market, x="Năm", y="Doanh Thu", color="Mảng", text_auto=True, color_discrete_map=COLOR_MAP)
-    fig_market.update_layout(height=250, margin=dict(b=0))
+    fig_market.update_layout(height=250, margin=dict(l=0, r=0, t=10, b=0), showlegend=False)
     st.plotly_chart(fig_market, use_container_width=True)
 
 with mid_2:
-    st.markdown('**CLV vs CAC ($)**')
+    st.markdown('<div class="chart-title">CLV vs CAC ($)</div>', unsafe_allow_html=True)
     fig_clv = go.Figure()
     fig_clv.add_trace(go.Scatter(name='CLV', x=['Q1', 'Q2', 'Q3', 'Q4'], y=[100, 120, 150, 180], mode='lines+markers+text', text=[100, 120, 150, 180], textposition='top left', line=dict(color='#0051a3')))
     fig_clv.add_trace(go.Scatter(name='CAC', x=['Q1', 'Q2', 'Q3', 'Q4'], y=[50, 55, 50, 45], mode='lines+markers+text', text=[50, 55, 50, 45], textposition='bottom right', line=dict(dash='dot', color='#d62728')))
-    fig_clv.update_layout(height=250, margin=dict(b=0))
+    fig_clv.update_layout(height=250, margin=dict(l=0, r=0, t=10, b=0), showlegend=False)
     st.plotly_chart(fig_clv, use_container_width=True)
 
 with mid_3:
-    st.markdown('**ROI Marketing (Tỷ VNĐ)**')
-    df_mkt = pd.DataFrame({"Kênh": ["Facebook", "Google", "Tiktok", "Event", "Báo chí"], "Chi phí": [2, 5, 1, 3, 0.5], "Doanh thu": [20, 60, 15, 10, 2]})
-    fig_mkt = px.scatter(df_mkt, x="Chi phí", y="Doanh thu", color="Kênh", size="Doanh thu", text="Kênh", color_discrete_map=COLOR_MAP)
-    fig_mkt.update_traces(textposition='top left')
-    fig_mkt.update_layout(height=250, margin=dict(b=0))
-    st.plotly_chart(fig_mkt, use_container_width=True)
-
-mid_4, mid_5 = st.columns(2)
-with mid_4:
-    st.markdown('**Tăng trưởng (%)**')
+    st.markdown('<div class="chart-title">Tăng trưởng (%)</div>', unsafe_allow_html=True)
     fig_growth = go.Figure()
     fig_growth.add_trace(go.Bar(name='Vietravel', x=['Q1', 'Q2', 'Q3'], y=[15, 20, 25], marker_color='#0051a3', text=[15, 20, 25], textposition='auto'))
     fig_growth.add_trace(go.Scatter(name='Ngành', x=['Q1', 'Q2', 'Q3'], y=[10, 12, 10], mode='lines+markers+text', text=[10, 12, 10], textposition='top center', line=dict(color='red')))
-    fig_growth.update_layout(height=300)
+    fig_growth.update_layout(height=250, margin=dict(l=0, r=0, t=10, b=0), showlegend=False)
     st.plotly_chart(fig_growth, use_container_width=True)
 
+with mid_4:
+    st.markdown('<div class="chart-title">ROI Marketing</div>', unsafe_allow_html=True)
+    df_mkt = pd.DataFrame({"Kênh": ["Facebook", "Google", "Tiktok", "Event", "Báo chí"], "Chi phí": [2, 5, 1, 3, 0.5], "Doanh thu": [20, 60, 15, 10, 2]})
+    fig_mkt = px.scatter(df_mkt, x="Chi phí", y="Doanh thu", color="Kênh", size="Doanh thu", text="Kênh", color_discrete_map=COLOR_MAP)
+    fig_mkt.update_traces(textposition='top left')
+    fig_mkt.update_layout(height=250, margin=dict(l=0, r=0, t=10, b=0), showlegend=False)
+    st.plotly_chart(fig_mkt, use_container_width=True)
+
 with mid_5:
-    st.markdown('**Thị phần tương đối (RMS - Lượt khách)**')
+    st.markdown('<div class="chart-title">Thị phần RMS</div>', unsafe_allow_html=True)
     df_bubble = pd.DataFrame({"Tuyến": ["Đông Bắc Á", "Âu Úc Mỹ", "Đông Nam Á", "Nội địa"], "RMS Index": [0.8, 1.2, 1.5, 0.9], "Tăng trưởng": [15, 10, 5, 8], "Lượt khách": [15000, 8000, 25000, 40000]})
-    df_bubble["Vị thế"] = df_bubble["RMS Index"].apply(lambda x: "Dẫn đầu" if x > 1 else "Theo sau")
     fig_bubble = px.scatter(df_bubble, x="RMS Index", y="Tăng trưởng", size="Lượt khách", color="Tuyến", text="Tuyến", size_max=60, color_discrete_map=COLOR_MAP) 
-    fig_bubble.add_vline(x=1, line_width=2, line_dash="dash", line_color="red", annotation_text="Đối thủ = Ta")
+    fig_bubble.add_vline(x=1, line_width=2, line_dash="dash", line_color="red")
     fig_bubble.update_traces(textposition='top center')
-    fig_bubble.update_layout(height=300)
+    fig_bubble.update_layout(height=250, margin=dict(l=0, r=0, t=10, b=0), showlegend=False)
     st.plotly_chart(fig_bubble, use_container_width=True)
 
 # ==============================================================================
